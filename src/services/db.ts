@@ -10,14 +10,16 @@ const ordersCollection = collection(db, 'orders');
 export const subscribeToProducts = (callback: (products: Product[]) => void) => {
   const q = query(productsCollection, where('isActive', '==', true));
   return onSnapshot(q, (snapshot) => {
-    const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product))
+      .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
     callback(products);
   });
 };
 
 export const subscribeToAllProducts = (callback: (products: Product[]) => void) => {
   return onSnapshot(productsCollection, (snapshot) => {
-    const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product))
+      .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
     callback(products);
   });
 };
@@ -57,7 +59,7 @@ export const createOrder = async (orderData: Omit<Order, 'id'>) => {
 };
 
 export const createProduct = async (productData: Omit<Product, 'id'>) => {
-  const docRef = await addDoc(productsCollection, productData);
+  const docRef = await addDoc(productsCollection, { ...productData, createdAt: Date.now() });
   return docRef.id;
 };
 

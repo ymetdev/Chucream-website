@@ -9,6 +9,7 @@ export interface Product {
   imageUrl: string;
   stockStatus: StockStatus;
   isActive: boolean; // For toggle via Admin
+  createdAt?: number; // timestamp for sorting
 }
 
 export interface OrderItem {
