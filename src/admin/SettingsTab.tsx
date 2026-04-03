@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { subscribeToAllProducts, subscribeToStoreConfig, toggleProductAvailability, updateStoreConfig, subscribeToOrders, addLoyaltyPoints, getUserByPhone, createProduct, updateProduct, deleteProduct } from '../services/db';
+import { subscribeToAllProducts, subscribeToStoreConfig, toggleProductAvailability, updateStoreConfig, subscribeToOrders, addLoyaltyPoints, getUserByPhone, createProduct, updateProduct, deleteProduct, clearAllOrders, clearAllCounters } from '../services/db';
 import { useNotification } from '../shared/components/Notification';
 import type { Product, Order } from '../shared/types';
 
@@ -10,6 +10,12 @@ export default function SettingsTab() {
   
   // Sales Report logic
   const [orders, setOrders] = useState<Order[]>([]);
+  const [showInsights, setShowInsights] = useState(false);
+  const getTodayStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const [reportDate, setReportDate] = useState(getTodayStr());
 
   // Modals state
   const [activeModal, setActiveModal] = useState<'location' | 'loyaltyRules' | 'manualPoints' | 'productForm' | null>(null);
@@ -45,6 +51,7 @@ export default function SettingsTab() {
   const [newProdImage, setNewProdImage] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -212,9 +219,63 @@ export default function SettingsTab() {
     }
   };
 
+  const handleClearHistory = async () => {
+    const isSure = await confirm({ 
+      message: 'ต้องการล้างประวัติคำสั่งซื้อและรหัสคิวทั้งหมดใช่หรือไม่? (ข้อมูลจะถูกลบถาวร กู้คืนไม่ได้)', 
+      type: 'danger' 
+    });
+    if (!isSure) return;
+
+    setIsClearing(true);
+    try {
+      await clearAllOrders();
+      await clearAllCounters();
+      notify('ล้างข้อมูลทดสอบทั้งหมดเรียบร้อยแล้ว!');
+    } catch (err) {
+      console.error(err);
+      notify('เกิดข้อผิดพลาดในการล้างข้อมูล', 'error');
+    }
+    setIsClearing(false);
+  };
+
   // Basic Sales Report calculation
-  const completedOrders = orders.filter(o => o.status === 'completed');
-  const todayRevenue = completedOrders.reduce((acc, o) => acc + o.totalPrice, 0);
+  const isSelectedDate = (timestamp: number) => {
+    const d = new Date(timestamp);
+    const localStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return localStr === reportDate;
+  };
+  const filteredOrders = orders.filter(o => isSelectedDate(o.createdAt));
+  const completedOrders = filteredOrders.filter(o => o.status === 'completed');
+  const selectedRevenue = completedOrders.reduce((acc, o) => acc + o.totalPrice, 0);
+
+  // Advanced Analytics Helpers
+  const get7DayTrend = () => {
+    const trend = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const dayName = d.toLocaleDateString('th-TH', { weekday: 'short' });
+      const dayRev = orders
+        .filter(o => o.status === 'completed' && new Date(o.createdAt).toLocaleDateString('en-CA') === dateStr)
+        .reduce((acc, o) => acc + o.totalPrice, 0);
+      trend.push({ dateStr, dayName, revenue: dayRev });
+    }
+    return trend;
+  };
+
+  const getTopSellers = () => {
+    const counts: Record<string, number> = {};
+    orders.filter(o => o.status === 'completed').forEach(o => {
+      o.items.forEach(item => {
+        counts[item.productId] = (counts[item.productId] || 0) + item.quantity;
+      });
+    });
+    return Object.entries(counts)
+      .map(([id, count]) => ({ id, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  };
 
   const renderModal = (title: string, content: React.ReactNode) => {
     return createPortal(
@@ -296,10 +357,39 @@ export default function SettingsTab() {
       <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
         {/* Basic Sales Dashboard [REQ-A07] */}
         <div className="dashboard-card">
-          <h3 style={{marginBottom: '24px', fontFamily: 'var(--font-heading)'}}>รายงานการขาย (วันนี้)</h3>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
+            <h3 style={{margin: 0, fontFamily: 'var(--font-heading)'}}>รายงานการขาย</h3>
+            <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+              <input 
+                type="date" 
+                value={reportDate} 
+                onChange={e => setReportDate(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--pos-border)',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  width: 'auto'
+                }}
+              />
+              {reportDate !== getTodayStr() && (
+                <button 
+                  className="btn-text" 
+                  onClick={() => setReportDate(getTodayStr())}
+                  style={{fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 700}}
+                >
+                  วันนี้
+                </button>
+              )}
+            </div>
+          </div>
+          
           <div className="revenue-badge">
-            <div style={{fontSize: '1rem', opacity: 0.9, marginBottom: '8px', fontWeight: 500}}>รายได้รวมวันนี้</div>
-            <div style={{fontSize: '3.5rem', fontWeight: 800, letterSpacing: '-1px'}}>฿{todayRevenue}</div>
+            <div style={{fontSize: '1rem', opacity: 0.9, marginBottom: '8px', fontWeight: 500}}>
+              {reportDate === getTodayStr() ? 'รายได้รวมวันนี้' : `รายได้รวม (${new Date(reportDate).toLocaleDateString('th-TH', {day: 'numeric', month: 'short'})})`}
+            </div>
+            <div style={{fontSize: '3.5rem', fontWeight: 800, letterSpacing: '-1px'}}>฿{selectedRevenue.toLocaleString()}</div>
           </div>
           
           <div style={{display: 'flex', gap: '16px'}}>
@@ -309,9 +399,63 @@ export default function SettingsTab() {
             </div>
             <div style={{flex: 1, background: 'var(--pos-bg)', padding: '20px', borderRadius: '20px', textAlign: 'center'}}>
               <div style={{fontSize: '0.85rem', color: 'var(--color-text-light)', marginBottom: '4px'}}>ออเดอร์รอดำเนินการ</div>
-              <div style={{fontSize: '1.5rem', fontWeight: 800}}>{orders.length - completedOrders.length}</div>
+              <div style={{fontSize: '1.5rem', fontWeight: 800}}>{filteredOrders.length - completedOrders.length}</div>
             </div>
           </div>
+
+          <button 
+            className="btn-text" 
+            onClick={() => setShowInsights(!showInsights)}
+            style={{marginTop: '20px', width: '100%', padding: '12px', border: '1px dashed var(--pos-border)', borderRadius: '16px', color: 'var(--color-primary)', fontWeight: 700}}
+          >
+            {showInsights ? '🔼 ซ่อนข้อมูลวิเคราะห์' : '📊 ดูข้อมูลเชิงลึก (7 วันที่ผ่านมา)'}
+          </button>
+
+          {showInsights && (
+            <div className="anim-slide-up" style={{marginTop: '24px', borderTop: '1px solid var(--pos-border)', paddingTop: '24px'}}>
+              <h4 style={{marginBottom: '16px', fontSize: '0.95rem'}}>แนวโน้มรายได้ 7 วัน</h4>
+              <div style={{height: '140px', width: '100%', position: 'relative', marginBottom: '24px'}}>
+                <svg width="100%" height="100%" viewBox="0 0 400 120" preserveAspectRatio="none">
+                  {/* Grid Lines */}
+                  <line x1="0" y1="100" x2="400" y2="100" stroke="#eee" strokeWidth="1" />
+                  {(() => {
+                    const trend = get7DayTrend();
+                    const maxRev = Math.max(...trend.map(t => t.revenue), 1000);
+                    const barWidth = 40;
+                    const gap = (400 - (trend.length * barWidth)) / (trend.length - 1);
+                    return trend.map((t, i) => {
+                      const h = (t.revenue / maxRev) * 100;
+                      const x = i * (barWidth + gap);
+                      return (
+                        <g key={i}>
+                          <rect 
+                            x={x} y={100 - h} width={barWidth} height={h} 
+                            rx="6" fill={i === 6 ? 'var(--color-primary)' : 'var(--pos-accent)'} 
+                            style={{transition: 'all 0.5s'}}
+                          />
+                          <text x={x + barWidth/2} y="115" fontSize="8" textAnchor="middle" fill="#8B7A6A">{t.dayName}</text>
+                          {t.revenue > 0 && <text x={x + barWidth/2} y={95 - h} fontSize="8" textAnchor="middle" fill="var(--color-primary)" fontWeight="700">฿{t.revenue}</text>}
+                        </g>
+                      );
+                    });
+                  })()}
+                </svg>
+              </div>
+
+              <h4 style={{marginBottom: '12px', fontSize: '0.95rem'}}>3 อันดับเมนูขายดี</h4>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                {getTopSellers().map((item, idx) => {
+                  const product = products.find(p => p.id === item.id);
+                  return (
+                    <div key={idx} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: 'var(--pos-bg)', borderRadius: '12px'}}>
+                      <span style={{fontSize: '0.9rem', fontWeight: 600}}>{idx + 1}. {product?.name || 'กำลังโหลด...'}</span>
+                      <span className="badge badge-primary" style={{fontSize: '0.8rem', padding: '4px 10px'}}>{item.count} ชิ้น</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Configurations Dashboard Hub */}
@@ -331,6 +475,19 @@ export default function SettingsTab() {
               <span>จัดการแต้ม</span>
             </div>
           </div>
+        </div>
+
+        <div className="dashboard-card" style={{borderColor: 'rgba(231, 76, 60, 0.2)', background: 'rgba(231, 76, 60, 0.02)'}}>
+          <h3 style={{marginBottom: '16px', color: 'var(--color-danger)', fontFamily: 'var(--font-heading)'}}>เขตอันตราย (Danger Zone)</h3>
+          <p style={{fontSize: '0.9rem', color: 'var(--color-text-light)', marginBottom: '20px'}}>ลบข้อมูลออเดอร์และรหัสคิวทิ้งทั้งหมด เหมาะสำหรับใช้รีเซ็ตระบบหลังจบช่วงทดสอบครับ</p>
+          <button 
+            className="btn" 
+            style={{background: 'var(--color-danger)', color: 'white', width: '100%', padding: '16px'}} 
+            onClick={handleClearHistory}
+            disabled={isClearing}
+          >
+            {isClearing ? 'กำลังลบข้อมูล...' : '💣 ล้างประวัติออเดอร์ทั้งหมด'}
+          </button>
         </div>
       </div>
 

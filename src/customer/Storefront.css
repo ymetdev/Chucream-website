@@ -11,8 +11,8 @@
 }
 
 .hero {
-  height: 80vh;
-  min-height: 550px;
+  height: 90vh; /* Increased height to balance more padding */
+  min-height: 650px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -21,8 +21,9 @@
   text-align: center;
   color: white;
   margin-bottom: 60px;
-  border-bottom-left-radius: 60px; /* Slightly more rounded */
+  border-bottom-left-radius: 60px;
   border-bottom-right-radius: 60px;
+  padding-top: 160px; /* Further offset for the navbar */
 }
 
 .hero-bg {
@@ -124,12 +125,56 @@
   border-radius: var(--radius-round);
 }
 
-.section-title {
-  text-align: center;
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin-bottom: 12px;
-  color: var(--color-text);
+.location-banner {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 16px; 
+  background: rgba(42, 36, 31, 0.4); 
+  backdrop-filter: blur(12px);
+  padding: 14px 28px; 
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin: 40px 0;
+}
+
+.location-banner:hover {
+  background: rgba(42, 36, 31, 0.5);
+  border-color: rgba(255,255,255,0.4);
+  transform: translateY(-2px);
+}
+
+.location-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.location-text strong {
+  color: var(--color-secondary);
   font-weight: 800;
+}
+
+.map-link-btn {
+  background: white;
+  color: var(--color-primary);
+  padding: 6px 16px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-left: 12px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.map-link-btn:hover {
+  background: var(--color-secondary);
+  color: var(--color-primary);
+  transform: scale(1.05);
 }
 
 .section-subtitle {

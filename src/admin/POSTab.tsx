@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { subscribeToProducts, subscribeToStoreConfig, createOrder, getUserByPhone, addLoyaltyPoints } from '../services/db';
 import { useNotification } from '../shared/components/Notification';
-import type { Product, OrderItem, UserTarget, Order, StoreConfig } from '../shared/types';
+import type { Product, OrderItem, UserTarget, StoreConfig } from '../shared/types';
 
 export default function POSTab() {
   const { notify } = useNotification();
@@ -95,7 +95,7 @@ export default function POSTab() {
         await addLoyaltyPoints(customerPhone, netPoints);
       }
 
-      const orderData: Omit<Order, 'id'> = {
+      const orderData = {
         customerPhone,
         customerName: user?.name || 'Walk-in',
         items: cart.map(c => ({
@@ -105,13 +105,13 @@ export default function POSTab() {
         })),
         totalPrice: total,
         pickupTime: 'Now',
-        status: 'pending', 
+        status: 'pending' as const, 
         paymentMethod: method,
-        paymentStatus: 'paid',
+        paymentStatus: 'paid' as const,
         createdAt: Date.now()
       };
       
-      await createOrder(orderData);
+      const { queueNumber } = await createOrder(orderData);
       
       setCart([]);
       setCustomerPhone('');
@@ -120,7 +120,7 @@ export default function POSTab() {
       setPointsUsed(0);
       setManualDiscountValue('');
       setShowQR(false);
-      setSuccessMsg(`Payment complete! Earned ${pointsEarned} pts. (Used ${pointsUsed} pts)`);
+      setSuccessMsg(`ออเดอร์ ${queueNumber} บันทึกสำเร็จ! (ได้รับ ${pointsEarned} แต้ม, ใช้ไป ${pointsUsed} แต้ม)`);
     } catch (err) {
       console.error(err);
       notify('เกิดข้อผิดพลาดในการชำระเงิน', 'error');
@@ -323,7 +323,7 @@ export default function POSTab() {
         <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(42,36,31,0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setSuccessMsg('')}>
           <div className="surface-card anim-slide-up" style={{maxWidth: '400px', width: '90%', textAlign: 'center', padding: '40px', boxShadow: 'var(--shadow-lg)'}} onClick={e => e.stopPropagation()}>
             <div style={{fontSize: '4rem', marginBottom: '16px'}}>✅</div>
-            <h3 style={{marginBottom: '16px', color: 'var(--color-success)', fontSize: '1.8rem'}}>ส่งไปยังห้องเครื่องแล้ว!</h3>
+            <h3 style={{marginBottom: '16px', color: 'var(--color-success)', fontSize: '1.8rem'}}>ส่งไปยังห้องครัวแล้ว!</h3>
             <p style={{color: 'var(--color-text-light)', marginBottom: '32px', fontSize: '1.1rem'}}>{successMsg.replace('Payment complete!', 'ชำระเงินเรียบร้อย!').replace('Earned', 'ได้รับ').replace('Used', 'ใช้ไป').replace('pts', 'แต้ม')}</p>
             <button className="btn btn-primary full-width" onClick={() => setSuccessMsg('')} style={{padding: '16px', fontSize: '1.1rem'}}>
               ปิดและรับออเดอร์ถัดไป

@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, updateDoc, setDoc, addDoc, onSnapshot, query, orderBy, where, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, updateDoc, setDoc, addDoc, onSnapshot, query, orderBy, where, deleteDoc, runTransaction, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import type { Product, Order, StoreConfig, UserTarget } from '../shared/types';
 
@@ -62,9 +62,29 @@ export const toggleProductAvailability = async (productId: string, stockStatus: 
   await updateDoc(docRef, data);
 };
 
-export const createOrder = async (orderData: Omit<Order, 'id'>) => {
-  const docRef = await addDoc(ordersCollection, orderData);
-  return docRef.id;
+export const getNextQueueNumber = async (): Promise<string> => {
+  const dateStr = new Date().toISOString().split('T')[0];
+  const counterRef = doc(db, 'counters', dateStr);
+
+  const nextNum = await runTransaction(db, async (transaction) => {
+    const counterDoc = await transaction.get(counterRef);
+    let count = 1;
+
+    if (counterDoc.exists()) {
+      count = (counterDoc.data().count || 0) + 1;
+    }
+
+    transaction.set(counterRef, { count });
+    return count;
+  });
+
+  return `#${nextNum.toString().padStart(2, '0')}`;
+};
+
+export const createOrder = async (orderData: Omit<Order, 'id' | 'queueNumber'>) => {
+  const queueNumber = await getNextQueueNumber();
+  const docRef = await addDoc(ordersCollection, { ...orderData, queueNumber });
+  return { id: docRef.id, queueNumber };
 };
 
 export const createProduct = async (productData: Omit<Product, 'id'>) => {
@@ -120,4 +140,17 @@ export const addReview = async (reviewData: Omit<any, 'id'>) => {
 export const deleteReview = async (id: string) => {
   const docRef = doc(db, 'reviews', id);
   await deleteDoc(docRef);
+};
+
+export const clearAllOrders = async () => {
+  const snapshot = await getDocs(ordersCollection);
+  const deletionPromises = snapshot.docs.map(d => deleteDoc(d.ref));
+  await Promise.all(deletionPromises);
+};
+
+export const clearAllCounters = async () => {
+  const countersCollection = collection(db, 'counters');
+  const snapshot = await getDocs(countersCollection);
+  const deletionPromises = snapshot.docs.map(d => deleteDoc(d.ref));
+  await Promise.all(deletionPromises);
 };

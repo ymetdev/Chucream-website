@@ -68,8 +68,10 @@ export default function KitchenTab() {
               {colOrders.map(order => (
                 <div key={order.id} className="order-ticket">
                   <div className="ticket-meta">
-                    <span>#{order.id.slice(-4).toUpperCase()}</span>
-                    <span>{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span className="ticket-id" style={{fontSize: '1.4rem', fontWeight: 800, opacity: 1, color: 'var(--color-primary)'}}>
+                      {order.queueNumber}
+                    </span>
+                    <span style={{fontWeight: 600}}>{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
 
                   <div className="ticket-customer-row">

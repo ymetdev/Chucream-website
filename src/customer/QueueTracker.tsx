@@ -26,8 +26,8 @@ export default function QueueTracker() {
   return (
     <div className="container queue-tracker anim-slide-up">
       <h2 className="section-title" style={{marginBottom: '8px'}}>สถานะคำสั่งซื้อของคุณ</h2>
-      <p className="text-center" style={{marginBottom: '40px', color: 'var(--color-text-light)'}}>
-        รหัสออเดอร์: <strong>{order.id.slice(-6).toUpperCase()}</strong>
+      <p className="text-center" style={{marginBottom: '40px', color: 'var(--color-text-light)', fontSize: '1.2rem'}}>
+        หมายเลขคิวของคุณ: <strong style={{fontSize: '2.5rem', color: 'var(--color-primary)', display: 'block', margin: '12px 0'}}>{order.queueNumber}</strong>
       </p>
       
       <div className="status-timeline">

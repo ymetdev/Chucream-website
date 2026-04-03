@@ -28,6 +28,7 @@ export interface Order {
   status: OrderStatus;
   paymentMethod: 'promptpay' | 'cash';
   paymentStatus: 'pending' | 'paid';
+  queueNumber: string; // e.g. "#01", "#02", resets daily
   createdAt: number; // timestamp
 }
 

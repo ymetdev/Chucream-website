@@ -23,26 +23,23 @@ export default function StorefrontHome() {
       <header className="hero">
         <div className="hero-bg"></div>
         <div className="hero-content">
-          <div className="badge badge-warning anim-slide-up" style={{marginBottom: '32px', borderRadius: '20px', padding: '10px 24px', fontSize: '0.9rem'}}>ชูครีมทำมือ... ที่เราตั้งใจทำสุดหัวใจ</div>
+          {/* Badge removed per request */}
           <h1 className="anim-slide-up">กัดคำไหน... ก็เจอกับความสุข</h1>
           <p className="anim-slide-up" style={{animationDelay: '0.1s'}}>อบสดใหม่ทุกวัน อัดไส้ครีมให้แน่นๆ จนล้นคำ...<br/>เพราะเราอยากให้คุณได้ทานของอร่อยที่สุด</p>
           
           {/* Location Info Integrated in Hero [REQ-C02 updated] */}
-          <div className="anim-slide-up" style={{animationDelay: '0.15s', margin: '40px 0'}}>
-            <div style={{
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '12px', 
-              background: 'rgba(69, 52, 36, 0.4)', 
-              backdropFilter: 'blur(8px)',
-              padding: '12px 24px', 
-              borderRadius: 'var(--radius-round)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              fontSize: '1rem',
-              fontWeight: 500
-            }}>
-              วันนี้พบกับเราได้ที่ <strong style={{color: 'var(--color-secondary)'}}>{config?.locationName || 'ตลาดนัดจตุจักร'}</strong> บูธ <strong style={{color: 'var(--color-secondary)'}}>{config?.boothNumber || 'G15'}</strong> ครับ
-              <a href={config?.mapUrl || '#'} target="_blank" rel="noreferrer" style={{color: 'white', textDecoration: 'underline', marginLeft: '10px', fontSize: '0.9rem'}}>ดูแผนที่</a>
+          {/* Redesigned Location Banner [REQ-C02 updated] */}
+          <div className="anim-slide-up" style={{animationDelay: '0.15s'}}>
+            <div className="location-banner">
+              <span className="location-text">
+                <svg viewBox="0 0 24 24" fill="var(--color-secondary)" style={{width: '20px', height: '20px'}}>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                วันนี้พบกับเราที่ <strong>{config?.locationName || 'ตลาดรถไฟ ศรีนครินทร์'}</strong> บูธ <strong>{config?.boothNumber || '5'}</strong>
+              </span>
+              <a href={config?.mapUrl || '#'} target="_blank" rel="noreferrer" className="map-link-btn">
+                ดูแผนที่ 🗺️
+              </a>
             </div>
           </div>
 

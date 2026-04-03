@@ -155,6 +155,15 @@ input::placeholder {
 }
 
 /* Card Surface */
+.surface-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  border: 1px solid rgba(197, 131, 82, 0.08);
+}
+
 .surface-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
