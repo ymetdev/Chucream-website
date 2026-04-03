@@ -1,0 +1,79 @@
+.admin-portal {
+  min-height: 100vh;
+  background-color: #f1f2f6; /* slightly different than storefront */
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-nav {
+  background: white;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+}
+
+.admin-brand {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.nav-btn {
+  height: 100%;
+  padding: 0 20px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+}
+
+.nav-btn:hover {
+  color: var(--color-primary);
+  background: rgba(195, 139, 88, 0.05);
+}
+
+.nav-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px;
+  color: var(--color-text-light);
+}
+
+/* POS specific styles */
+.pos-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  height: calc(100vh - 110px);
+}
+
+@media (max-width: 900px) {
+  .pos-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}

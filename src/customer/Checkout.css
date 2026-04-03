@@ -1,0 +1,34 @@
+.payment-flow {
+  max-width: 600px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--color-text-light);
+}
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding-top: 16px;
+  margin-top: 16px;
+  font-size: 1.35rem;
+}
+.pickup-time {
+  margin-top: 12px;
+  color: var(--color-success);
+  font-weight: 500;
+}
+.qr-placeholder {
+  background: white;
+  padding: 16px;
+  display: inline-block;
+  border-radius: var(--radius-md);
+  margin: 24px 0;
+  box-shadow: var(--shadow-sm);
+}

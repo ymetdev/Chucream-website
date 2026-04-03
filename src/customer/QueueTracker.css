@@ -1,0 +1,55 @@
+.queue-tracker {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.status-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 40px 0;
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0.4;
+  transition: all var(--transition-normal);
+  width: 100px;
+}
+
+.timeline-step.active {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.step-icon {
+  font-size: 2.5rem;
+  background: var(--color-surface);
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+}
+
+.timeline-step.active .step-icon {
+  box-shadow: 0 0 15px rgba(195, 139, 88, 0.4);
+}
+
+.timeline-connector {
+  flex-grow: 1;
+  height: 4px;
+  background: rgba(0,0,0,0.05);
+  margin-top: -30px;
+}
