@@ -23,23 +23,43 @@ export default function StorefrontHome() {
       <header className="hero">
         <div className="hero-bg"></div>
         <div className="hero-content">
-          <div className="badge badge-warning anim-slide-up" style={{marginBottom: '20px', borderRadius: '20px', padding: '8px 20px'}}>✨ ชูครีมทำมือระดับพรีเมียม</div>
-          <h1 className="anim-slide-up">ที่สุดของประสบการณ์ชูครีม</h1>
-          <p className="anim-slide-up" style={{animationDelay: '0.1s'}}>พิถีพิถันทุกขั้นตอน อร่อยเต็มคำกับไส้ครีมสุดพรีเมียม</p>
-          <div className="anim-slide-up" style={{animationDelay: '0.2s', display: 'flex', gap: '16px', justifyContent: 'center'}}>
+          <div className="badge badge-warning anim-slide-up" style={{marginBottom: '32px', borderRadius: '20px', padding: '10px 24px', fontSize: '0.9rem'}}>ชูครีมทำมือ... ที่เราตั้งใจทำสุดหัวใจ</div>
+          <h1 className="anim-slide-up">กัดคำไหน... ก็เจอกับความสุข</h1>
+          <p className="anim-slide-up" style={{animationDelay: '0.1s'}}>อบสดใหม่ทุกวัน อัดไส้ครีมให้แน่นๆ จนล้นคำ...<br/>เพราะเราอยากให้คุณได้ทานของอร่อยที่สุด</p>
+          
+          {/* Location Info Integrated in Hero [REQ-C02 updated] */}
+          <div className="anim-slide-up" style={{animationDelay: '0.15s', margin: '40px 0'}}>
+            <div style={{
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              background: 'rgba(69, 52, 36, 0.4)', 
+              backdropFilter: 'blur(8px)',
+              padding: '12px 24px', 
+              borderRadius: 'var(--radius-round)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              fontSize: '1rem',
+              fontWeight: 500
+            }}>
+              วันนี้พบกับเราได้ที่ <strong style={{color: 'var(--color-secondary)'}}>{config?.locationName || 'ตลาดนัดจตุจักร'}</strong> บูธ <strong style={{color: 'var(--color-secondary)'}}>{config?.boothNumber || 'G15'}</strong> ครับ
+              <a href={config?.mapUrl || '#'} target="_blank" rel="noreferrer" style={{color: 'white', textDecoration: 'underline', marginLeft: '10px', fontSize: '0.9rem'}}>ดูแผนที่</a>
+            </div>
+          </div>
+
+          <div className="anim-slide-up" style={{animationDelay: '0.2s', display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '16px'}}>
             <button 
               className="btn btn-primary" 
               style={{padding: '16px 36px', fontSize: '1.1rem', borderRadius: '30px'}}
               onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              ดูเมนูแนะนำ
+              แวะดูเมนูวันนี้
             </button>
             <button 
               className="btn btn-outline" 
               style={{padding: '16px 36px', fontSize: '1.1rem', borderRadius: '30px', color: 'white', borderColor: 'white'}}
               onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              เรื่องราวของเรา
+              รู้จักเราให้มากขึ้น
             </button>
           </div>
         </div>
@@ -49,38 +69,31 @@ export default function StorefrontHome() {
         {/* Benefits Section */}
         <section id="benefits" className="benefits-grid anim-slide-up">
           <div className="benefit-card surface-card">
-            <span className="benefit-icon">🥖</span>
-            <h4>อบสดใหม่ทุกวัน</h4>
-            <p>ชูครีมของเราอบสดใหม่ทุกวันเพื่อให้ได้ความกรอบที่สมบูรณ์แบบในทุกคำที่กัด</p>
+            <span className="benefit-icon" style={{fontSize: '1.2rem', color: 'var(--color-primary)', fontWeight: 700}}>FRESH</span>
+            <h4>อบใหม่จากเตาทุกเช้า</h4>
+            <p>เราอบขนมสดๆ ใหม่ๆ ทุกวัน เพราะความกรอบหอมคือหัวใจของชูครีมร้านเราครับ</p>
           </div>
           <div className="benefit-card surface-card">
-            <span className="benefit-icon">🥛</span>
-            <h4>วัตถุดิบพรีเมียม</h4>
-            <p>ทำจากเนยแท้ 100% ไข่ออร์แกนิก และวานิลลาแท้คุณภาพเยี่ยม</p>
+            <span className="benefit-icon" style={{fontSize: '1.2rem', color: 'var(--color-primary)', fontWeight: 700}}>PREMIUM</span>
+            <h4>ของดี... เราถึงกล้าใช้</h4>
+            <p>คัดแต่เนยแท้หอมๆ และแป้งคุณภาพดีมาทำ เพราะเราอยากให้ทุกคนได้ทานของที่มีคุณภาพจริงๆ</p>
           </div>
           <div className="benefit-card surface-card">
-            <span className="benefit-icon">⚡</span>
-            <h4>เช็กสต็อก Real-time</h4>
-            <p>รับข้อมูลสต็อกขนมล่าสุดได้ทันที ไม่ต้องกลัวมาเก้อ รู้ก่อนใครว่าไส้ไหนยังเหลืออยู่</p>
+            <span className="benefit-icon" style={{fontSize: '1.2rem', color: 'var(--color-primary)', fontWeight: 700}}>LIVE</span>
+            <h4>ไม่ต้องรอเก้อ</h4>
+            <p>เช็กสต็อกหน้าเว็บได้ตลอดเวลา จะได้รู้ว่าไส้ที่เล็งไว้ยังเหลืออยู่ไหม ไม่ต้องมาเสียเที่ยวแน่นอน</p>
           </div>
         </section>
 
-        {/* Live Location Widget [REQ-C02] */}
-        <section className="location-widget anim-slide-up">
-          <div className="location-info">
-            <h3 style={{display: 'flex', alignItems: 'center', gap: '12px', margin: 0}}>
-              <span style={{fontSize: '2rem'}}>📍</span> 
-              พบกับเราได้ที่ {config?.locationName || 'ตลาดนัดจตุจักร'}
-            </h3>
-            <p style={{color: 'var(--color-text-light)', marginLeft: '42px', marginTop: '4px', fontSize: '1.1rem'}}>บูธ: <strong>{config?.boothNumber || 'G15'}</strong></p>
-          </div>
-          <a href={config?.mapUrl || '#'} target="_blank" rel="noreferrer" className="btn btn-primary" style={{borderRadius: 'var(--radius-round)', padding: '12px 24px'}}>ขอเส้นทาง</a>
-        </section>
+
+
+        {/* Live Location Widget removed from here, moved to Hero */}
+        
 
         {/* Catalog [REQ-C01] */}
         <section id="catalog" className="catalog">
-          <h2 className="section-title">เมนูแนะนำ</h2>
-          <p className="section-subtitle">เลือกอร่อยกับไส้ครีมในฝันของคุณ</p>
+          <h2 className="section-title">วันนี้มีอะไรน่ากินบ้าง?</h2>
+          <p className="section-subtitle">เลือกความอร่อยที่ถูกใจคุณได้เลย</p>
           
           <div className="product-grid">
             {products.length === 0 ? (
@@ -114,8 +127,8 @@ export default function StorefrontHome() {
                     <p className="desc">{p.description}</p>
                     {/* Pre-order removed, just viewing [REQ-C04 updated] */}
                     <div 
-                      className={`badge ${p.stockStatus === 'available' ? 'badge-success' : p.stockStatus === 'unavailable' ? 'badge-secondary' : 'badge-danger'}`}
-                      style={{marginTop: 'auto', padding: '12px', textAlign: 'center', borderRadius: '8px', fontWeight: 600, background: p.stockStatus === 'unavailable' ? '#9ca3af' : undefined, color: p.stockStatus === 'unavailable' ? 'white' : undefined}}
+                      className={`badge ${['available', 'low_stock'].includes(p.stockStatus) ? 'badge-success' : p.stockStatus === 'unavailable' ? 'badge-secondary' : 'badge-danger'}`}
+                      style={{marginTop: 'auto', padding: '12px', display: 'flex', justifyContent: 'center', borderRadius: '8px', fontWeight: 600, background: p.stockStatus === 'unavailable' ? '#9ca3af' : undefined, color: p.stockStatus === 'unavailable' ? 'white' : undefined}}
                     >
                       {p.stockStatus === 'sold_out' ? 'สินค้าหมดแล้ว' : p.stockStatus === 'unavailable' ? 'งดจำหน่ายชั่วคราว' : 'มีจำหน่ายที่หน้าร้าน'}
                     </div>
@@ -125,34 +138,87 @@ export default function StorefrontHome() {
             )}
           </div>
         </section>
+
+
+
+
+
+        {/* Social Bento Section [NEW/REPLACEMENT] */}
+        <section className="social-section anim-slide-up">
+          <h2 className="section-title">มาเป็นเพื่อนกับเรานะ</h2>
+          <p className="section-subtitle">เรามีขนมใหม่ๆ และบรรยากาศน่ารักๆ มาฝากเสมอทุกช่องทางเลย</p>
+          
+          <div className="bento-grid">
+            {/* Instagram Card - Large */}
+            <a href={`https://instagram.com/${config?.instagramUser?.replace('@', '') || ''}`} target="_blank" rel="noreferrer" className="bento-card large">
+              <div className="bento-content">
+                <h3 className="bento-title">Instagram</h3>
+                <p className="bento-desc">{config?.instagramUser || '@chouxcream.bkk'}<br/>แวะมาดูสตอรี่การทำขนมสดๆ และรูปสวยๆ ได้ที่นี่นะคะ</p>
+                <div className="badge badge-primary" style={{marginTop: '20px', background: 'var(--color-primary)', color: 'white'}}>Follow Us!</div>
+              </div>
+            </a>
+
+            {/* Facebook Card - Medium */}
+            <a href={config?.facebookLink || '#'} target="_blank" rel="noreferrer" className="bento-card medium">
+              <div className="bento-content">
+                <h3 className="bento-title">Facebook Page</h3>
+                <p className="bento-desc">ตามไปเล่นกิจกรรมร่วมสนุก แจกขนมฟรีๆ และอัปเดตตารางการออกบูธตลาดนัดได้เลยจ้า</p>
+              </div>
+            </a>
+
+            {/* Line Card - Small */}
+            <a href={`https://line.me/R/ti/p/~${config?.lineId?.replace('@', '') || ''}`} target="_blank" rel="noreferrer" className="bento-card small">
+              <div className="bento-content">
+                <h3 className="bento-title">LINE Official</h3>
+                <p className="bento-desc">{config?.lineId || '@chouxcream'}<br/>ทักมาจองล่วงหน้าได้เลย!</p>
+              </div>
+            </a>
+
+            {/* TikTok Card - Small */}
+            <a href={`https://tiktok.com/@${config?.tiktokUser?.replace('@', '') || ''}`} target="_blank" rel="noreferrer" className="bento-card small">
+              <div className="bento-content">
+                <h3 className="bento-title">TikTok</h3>
+                <p className="bento-desc">{config?.tiktokUser || '@chouxcream'}<br/>คลิปเบื้องหลังการทำขนมแบบเพลินๆ</p>
+              </div>
+            </a>
+          </div>
+        </section>
       </div>
 
       <footer className="footer">
         <div className="container">
           <div className="footer-content">
             <div className="footer-brand">
-              <h2>Choux Cream PWA</h2>
-              <p>สรรค์สร้างประสบการณ์ชูครีมที่สมบูรณ์แบบตั้งแต่ปี 2024 คุณภาพที่คุณสัมผัสได้</p>
+              <h2 style={{fontFamily: 'var(--font-heading)', color: 'white'}}>Choux Cream</h2>
+              <p>สรรค์สร้างประสบการณ์ชูครีมที่สมบูรณ์แบบตั้งแต่ปี 2024 คุณภาพที่คุณสัมผัสได้ในทุกคำ</p>
             </div>
             <div className="footer-links">
-              <h4>ลิงก์ด่วน</h4>
+              <h4>สำรวจ</h4>
               <ul>
-                <li><a href="#catalog">เมนู</a></li>
-                <li><a href="#benefits">เรื่องราวของเรา</a></li>
-                <li><a href="/tracker">ติดตามคำสั่งซื้อ</a></li>
+                <li><a href="#catalog">เมนูทั้งหมด</a></li>
+                <li><a href="#benefits">จุดเด่นของเรา</a></li>
+                <li><a href="#">ระบบสมาชิก</a></li>
               </ul>
             </div>
             <div className="footer-links">
-              <h4>ติดต่อเรา</h4>
+              <h4>ช่วยเหลือ</h4>
               <ul>
-                <li><a href="#">LINE: @chouxpwa</a></li>
-                <li><a href="#">Instagram: @chouxpwa</a></li>
-                <li><a href="#">Facebook: Choux PWA</a></li>
+                <li><a href="#">วิธีการเก็บรักษา</a></li>
+                <li><a href="#">คำถามที่พบบ่อย</a></li>
+                <li><a href="#">นโยบายความเป็นส่วนตัว</a></li>
               </ul>
+            </div>
+            <div className="footer-links">
+              <h4>ติดตามความนุ่มนวล</h4>
+              <div style={{display: 'flex', gap: '16px', marginTop: '12px'}}>
+                <a href="#" style={{fontSize: '0.9rem', fontWeight: 600}}>LINE</a>
+                <a href="#" style={{fontSize: '0.9rem', fontWeight: 600}}>INSTRAGRAM</a>
+                <a href="#" style={{fontSize: '0.9rem', fontWeight: 600}}>FACEBOOK</a>
+              </div>
             </div>
           </div>
           <div className="footer-bottom">
-            &copy; 2024 Choux Cream Artisan. สงวนลิขสิทธิ์. ทำด้วย ❤️ ที่กรุงเทพฯ
+            &copy; 2024 Choux Cream Artisan. สงวนลิขสิทธิ์. ทำด้วยความใส่ใจที่กรุงเทพฯ
           </div>
         </div>
       </footer>

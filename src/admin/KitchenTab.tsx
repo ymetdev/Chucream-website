@@ -54,48 +54,64 @@ export default function KitchenTab() {
   ];
 
   return (
-    <div className="anim-slide-up" style={{display: 'flex', gap: '24px', overflowX: 'auto', paddingBottom: '24px', height: 'calc(100vh - 120px)'}}>
-      {columns.map(col => (
-        <div key={col.status} className="surface-card" style={{minWidth: '350px', flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.02)'}}>
-          <h3 style={{borderBottom: `3px solid ${col.color}`, paddingBottom: '12px', marginBottom: '16px'}}>
-            {col.title} ({orders.filter(o => o.status === col.status).length})
-          </h3>
-          <div style={{flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px'}}>
-            {orders.filter(o => o.status === col.status).map(order => (
-              <div key={order.id} className="surface-card" style={{padding: '16px', border: `1px solid ${col.color}`, position: 'relative'}}>
-                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px'}}>
-                  <span style={{fontWeight: 700}}>#{order.id.slice(-4).toUpperCase()}</span>
-                  <span style={{color: 'var(--color-text-light)'}}>{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+    <div className="kitchen-layout anim-slide-up">
+      {columns.map(col => {
+        const colOrders = orders.filter(o => o.status === col.status);
+        return (
+          <div key={col.status} className="kitchen-column">
+            <div className="column-header" style={{borderBottomColor: col.color}}>
+              <h3>{col.title}</h3>
+              <span className="order-count-badge">{colOrders.length}</span>
+            </div>
+
+            <div className="kitchen-scroll">
+              {colOrders.map(order => (
+                <div key={order.id} className="order-ticket">
+                  <div className="ticket-meta">
+                    <span>#{order.id.slice(-4).toUpperCase()}</span>
+                    <span>{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                  </div>
+
+                  <div className="ticket-customer-row">
+                    <span className="ticket-customer-name">
+                      {order.customerName === 'Walk-in' ? '🛒 ลูกค้าหน้าร้าน' : `👤 ${order.customerName}`}
+                    </span> 
+                    {order.pickupTime && (
+                      <span className="badge badge-warning" style={{padding: '6px 12px', borderRadius: '10px'}}>
+                        {order.pickupTime === 'Now' ? '🔥 รับทันที' : `🕒 นัดรับ ${order.pickupTime} น.`}
+                      </span>
+                    )}
+                  </div>
+
+                  <ul className="ticket-item-list">
+                    {order.items.map((item, idx) => (
+                      <li key={idx}>
+                        <strong>{item.quantity}x</strong> {item.productId === 'free_reward' ? (config?.freeSnackName || '🎁 Free Premium Choux') : (products[item.productId]?.name || 'Loading...')}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div style={{display: 'flex', gap: '10px'}}>
+                    <button className="btn-kitchen-action" onClick={() => moveOrder(order.id, order.status)} style={{background: col.color, color: 'white'}}>
+                      ถัดไป <span>➡️</span>
+                    </button>
+                    <button className="btn btn-outline" onClick={async () => { if(await confirm({ message: 'ต้องการยกเลิกออเดอร์นี้ใช่หรือไม่?', type: 'danger' })) updateOrderStatus(order.id, 'voided') }} style={{color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '16px', borderRadius: '14px'}}>
+                      🗑️
+                    </button>
+                  </div>
                 </div>
-                <div style={{marginBottom: '16px'}}>
-                  <strong>{order.customerName}</strong> 
-                  {order.pickupTime && <span className="badge badge-warning" style={{marginLeft: '8px'}}>นัดรับ {order.pickupTime} น.</span>}
+              ))}
+              
+              {colOrders.length === 0 && (
+                <div style={{textAlign: 'center', color: 'var(--color-text-light)', padding: '60px 0', opacity: 0.4}}>
+                  <div style={{fontSize: '3rem', marginBottom: '12px'}}>🍳</div>
+                  <p>ไม่มีรายการ</p>
                 </div>
-                <ul style={{listStyle: 'none', marginBottom: '16px', background: 'var(--color-surface)', padding: '12px', borderRadius: 'var(--radius-sm)'}}>
-                  {order.items.map((item, idx) => (
-                    <li key={idx} style={{marginBottom: '6px', fontSize: '1.1rem'}}>
-                      <strong>{item.quantity}x</strong> {item.productId === 'free_reward' ? (config?.freeSnackName || '🎁 Free Premium Choux') : (products[item.productId]?.name || 'Loading...')}
-                    </li>
-                  ))}
-                </ul>
-                <div style={{display: 'flex', gap: '8px', marginTop: 'auto'}}>
-                  <button className="btn btn-primary" onClick={() => moveOrder(order.id, order.status)} style={{flex: 1, background: col.color, display: 'flex', justifyContent: 'center', padding: '12px'}}>
-                    <span style={{marginRight: '8px'}}>ถัดไป</span> ➡️
-                  </button>
-                  <button className="btn btn-outline" onClick={async () => { if(await confirm({ message: 'ต้องการยกเลิกออเดอร์นี้ใช่หรือไม่?', type: 'danger' })) updateOrderStatus(order.id, 'voided') }} style={{color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '12px'}}>
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))}
-            {orders.filter(o => o.status === col.status).length === 0 && (
-              <div style={{textAlign: 'center', color: 'var(--color-text-light)', padding: '40px'}}>
-                ไม่มีรายการในขั้นตอนนี้
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

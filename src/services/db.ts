@@ -5,6 +5,7 @@ import type { Product, Order, StoreConfig, UserTarget } from '../shared/types';
 // Collection references
 const productsCollection = collection(db, 'products');
 const ordersCollection = collection(db, 'orders');
+const reviewsCollection = collection(db, 'reviews');
 
 // Real-time Listeners
 export const subscribeToProducts = (callback: (products: Product[]) => void) => {
@@ -42,6 +43,14 @@ export const subscribeToStoreConfig = (callback: (config: StoreConfig | null) =>
     } else {
       callback(null);
     }
+  });
+}
+
+export const subscribeToReviews = (callback: (reviews: any[]) => void) => {
+  const q = query(reviewsCollection, orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(reviews);
   });
 }
 
@@ -101,4 +110,14 @@ export const addLoyaltyPoints = async (phoneNumber: string, pointsToAdd: number,
   } else {
     await setDoc(docRef, { points: pointsToAdd, name: name || 'Customer' });
   }
+};
+
+export const addReview = async (reviewData: Omit<any, 'id'>) => {
+  const docRef = await addDoc(reviewsCollection, { ...reviewData, createdAt: Date.now() });
+  return docRef.id;
+};
+
+export const deleteReview = async (id: string) => {
+  const docRef = doc(db, 'reviews', id);
+  await deleteDoc(docRef);
 };

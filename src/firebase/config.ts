@@ -1,9 +1,6 @@
 import { getApps, initializeApp } from 'firebase/app';
 import { 
-  getFirestore,
-  initializeFirestore, 
-  persistentLocalCache, 
-  persistentMultipleTabManager 
+  getFirestore
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -21,10 +18,10 @@ export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getA
 
 let dbInstance;
 try {
-  dbInstance = initializeFirestore(app, {
-    localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-  });
+  // Using standard getFirestore to avoid Safari IndexedDB crashes
+  dbInstance = getFirestore(app);
 } catch (e) {
+  console.warn("Firestore initialization fallback", e);
   dbInstance = getFirestore(app);
 }
 

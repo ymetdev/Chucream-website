@@ -4,6 +4,7 @@ import { NotificationProvider } from './shared/components/Notification';
 
 const StorefrontHome = React.lazy(() => import('./customer/StorefrontHome'));
 const QueueTracker = React.lazy(() => import('./customer/QueueTracker'));
+const CustomerLayout = React.lazy(() => import('./customer/CustomerLayout'));
 const AdminPOS = React.lazy(() => import('./admin/AdminPOS'));
 
 function App() {
@@ -13,8 +14,10 @@ function App() {
         <Suspense fallback={<div className="container" style={{paddingTop: '20vh', textAlign: 'center'}}>กำลังเตรียมความอร่อย...</div>}>
           <Routes>
             {/* Customer Routes */}
-            <Route path="/" element={<StorefrontHome />} />
-            <Route path="/queue/:orderId" element={<QueueTracker />} />
+            <Route element={<CustomerLayout />}>
+              <Route path="/" element={<StorefrontHome />} />
+              <Route path="/queue/:orderId" element={<QueueTracker />} />
+            </Route>
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminPOS />} />

@@ -27,6 +27,12 @@ export default function SettingsTab() {
   const [freeSnackPointsCost, setFreeSnackPointsCost] = useState(50);
   const [freeSnackName, setFreeSnackName] = useState('🎁 Free Premium Choux');
 
+  // Social Media
+  const [instagramUser, setInstagramUser] = useState('');
+  const [facebookLink, setFacebookLink] = useState('');
+  const [lineId, setLineId] = useState('');
+  const [tiktokUser, setTiktokUser] = useState('');
+
   // Loyalty edits
   const [loyaltyPhone, setLoyaltyPhone] = useState('');
   const [loyaltyAdd, setLoyaltyAdd] = useState<number | ''>('');
@@ -155,6 +161,10 @@ export default function SettingsTab() {
         setDiscountValue(c.discountValue || 10);
         setFreeSnackPointsCost(c.freeSnackPointsCost || 50);
         setFreeSnackName(c.freeSnackName || '🎁 Free Premium Choux');
+        setInstagramUser(c.instagramUser || '');
+        setFacebookLink(c.facebookLink || '');
+        setLineId(c.lineId || '');
+        setTiktokUser(c.tiktokUser || '');
       }
     });
     const unsubO = subscribeToOrders(setOrders);
@@ -176,7 +186,11 @@ export default function SettingsTab() {
       discountPointsCost,
       discountValue,
       freeSnackPointsCost,
-      freeSnackName
+      freeSnackName,
+      instagramUser,
+      facebookLink,
+      lineId,
+      tiktokUser
     });
     notify('อัปเดตการตั้งค่าระบบเรียบร้อย!');
     setActiveModal(null);
@@ -204,11 +218,11 @@ export default function SettingsTab() {
 
   const renderModal = (title: string, content: React.ReactNode) => {
     return createPortal(
-      <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(42,36,31,0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => { setActiveModal(null); setEditId(null); setNewProdName(''); setNewProdDesc(''); setNewProdPrice(''); }}>
-        <div className="surface-card anim-slide-up" style={{width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto'}} onClick={e => e.stopPropagation()}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
-            <h2 style={{margin: 0}}>{title}</h2>
-            <button onClick={() => { setActiveModal(null); setEditId(null); setNewProdName(''); setNewProdDesc(''); setNewProdPrice(''); }} style={{fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)'}}>✖</button>
+      <div className="modal-overlay" onClick={() => { setActiveModal(null); setEditId(null); setNewProdName(''); setNewProdDesc(''); setNewProdPrice(''); }}>
+        <div className="modal-content anim-slide-up" onClick={e => e.stopPropagation()}>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px'}}>
+            <h2 style={{margin: 0, fontFamily: 'var(--font-heading)'}}>{title}</h2>
+            <button onClick={() => { setActiveModal(null); setEditId(null); setNewProdName(''); setNewProdDesc(''); setNewProdPrice(''); }} style={{fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', opacity: 0.5}}>✖</button>
           </div>
           {content}
         </div>
@@ -218,60 +232,59 @@ export default function SettingsTab() {
   };
 
   return (
-    <div className="anim-slide-up" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px', paddingBottom: '80px'}}>
+    <div className="settings-grid anim-slide-up">
       
-      <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+      <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
         {/* Inventory & Stock [REQ-A04] */}
-        <div className="surface-card">
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
-            <h3 style={{margin: 0}}>จัดการสต็อกสินค้า</h3>
-            <div style={{display: 'flex', gap: '8px'}}>
-              <button className="btn btn-outline" style={{padding: '6px 12px', fontSize: '0.9rem'}} onClick={handleLoadMocks}>
+        <div className="dashboard-card">
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
+            <h3 style={{margin: 0, fontFamily: 'var(--font-heading)'}}>จัดการสต็อกสินค้า</h3>
+            <div style={{display: 'flex', gap: '10px'}}>
+              <button className="btn btn-outline" style={{padding: '8px 16px', fontSize: '0.85rem'}} onClick={handleLoadMocks}>
                 ✨ โหลดตัวอย่างเมนู
               </button>
-              <button className="btn btn-primary" style={{padding: '6px 12px', fontSize: '0.9rem'}} onClick={() => { setEditId(null); setNewProdName(''); setNewProdDesc(''); setNewProdPrice(''); setActiveModal('productForm'); }}>
-                + เพิ่มสินค้า
+              <button className="btn btn-primary" style={{padding: '8px 16px', fontSize: '0.85rem'}} onClick={() => { setEditId(null); setNewProdName(''); setNewProdDesc(''); setNewProdPrice(''); setActiveModal('productForm'); }}>
+                + เพิ่มสินค้าใหม่
               </button>
             </div>
           </div>
-          <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+
+          <div style={{display: 'flex', flexDirection: 'column'}}>
             {products.map(p => (
-              <div key={p.id} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', 
-                background: p.stockStatus === 'unavailable' ? 'rgba(0,0,0,0.02)' : 'var(--color-bg)', 
-                borderRadius: 'var(--radius-sm)',
-                opacity: p.stockStatus === 'unavailable' ? 0.8 : 1,
-                border: p.stockStatus === 'unavailable' ? '1px dashed #ccc' : '1px solid transparent',
-                transition: 'all 0.2s'
-              }}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                  <img src={p.imageUrl || '/choux_cream_hero.png'} alt={p.name} style={{
-                    width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover',
-                    filter: p.stockStatus === 'unavailable' ? 'grayscale(100%)' : 'none',
-                    opacity: p.stockStatus === 'unavailable' ? 0.5 : 1
-                  }} />
+              <div key={p.id} className="inventory-card" style={{opacity: p.stockStatus === 'unavailable' ? 0.6 : 1}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
+                  <div style={{position: 'relative'}}>
+                    <img src={p.imageUrl || '/choux_cream_hero.png'} alt={p.name} style={{
+                      width: '50px', height: '50px', borderRadius: '12px', objectFit: 'cover'
+                    }} />
+                  </div>
                   <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <span style={{fontWeight: 600, color: p.stockStatus === 'unavailable' ? 'var(--color-text-light)' : 'var(--color-text)', textDecoration: p.stockStatus === 'unavailable' ? 'line-through' : 'none'}}>{p.name}</span>
-                    <span style={{fontSize: '0.85rem', color: 'var(--color-text-light)'}}>฿{p.price}</span>
+                    <span style={{fontWeight: 700, fontSize: '1.05rem'}}>{p.name}</span>
+                    <span style={{fontSize: '0.9rem', color: 'var(--color-primary)', fontWeight: 600}}>฿{p.price}</span>
                   </div>
                 </div>
-                <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                  <button className="badge" onClick={() => handleEditClick(p)} style={{background: 'var(--color-secondary)', color: 'var(--color-text)', border: 'none', cursor: 'pointer', padding: '8px 12px'}}>
-                    ✏️
-                  </button>
-                  <button className="badge badge-danger" onClick={() => handleDeleteProduct(p.id)} style={{border: 'none', cursor: 'pointer', padding: '8px 12px'}}>
-                    🗑️
-                  </button>
+                <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+                  <button className="qty-btn minus" onClick={() => handleEditClick(p)} style={{width: '36px', height: '36px', background: 'var(--pos-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRadius: '50%', cursor: 'pointer'}}>✏️</button>
+                  <button className="qty-btn minus" onClick={() => handleDeleteProduct(p.id)} style={{width: '36px', height: '36px', background: 'rgba(231, 76, 60, 0.1)', color: 'var(--color-danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRadius: '50%', cursor: 'pointer'}}>🗑️</button>
+                  
                   <select 
                     className={`badge ${p.stockStatus === 'available' ? 'badge-success' : p.stockStatus === 'low_stock' ? 'badge-warning' : p.stockStatus === 'unavailable' ? 'badge-secondary' : 'badge-danger'}`}
-                    style={{cursor: 'pointer', border: 'none', padding: '6px 12px', outline: 'none', background: p.stockStatus === 'unavailable' ? '#9ca3af' : undefined, color: p.stockStatus === 'unavailable' ? 'white' : undefined, fontSize: '0.9rem', fontWeight: 600}}
+                    style={{
+                      cursor: 'pointer', 
+                      border: '1px solid rgba(0,0,0,0.05)', 
+                      padding: '8px 12px', 
+                      borderRadius: '12px',
+                      outline: 'none', 
+                      fontSize: '0.85rem', 
+                      fontWeight: 700
+                    }}
                     value={p.stockStatus}
                     onChange={(e) => handleToggleStock(p.id, e.target.value)}
                   >
-                    <option value="available" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>🟢 มีสินค้า</option>
-                    <option value="low_stock" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>🟡 ใกล้หมด</option>
-                    <option value="sold_out" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>🔴 หมด</option>
-                    <option value="unavailable" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>⚪ งดจำหน่ายชั่วคราว</option>
+                    <option value="available">🟢 มีสินค้า</option>
+                    <option value="low_stock">🟡 ใกล้หมด</option>
+                    <option value="sold_out">🔴 หมด</option>
+                    <option value="unavailable">⚪ งดขาย</option>
                   </select>
                 </div>
               </div>
@@ -280,38 +293,43 @@ export default function SettingsTab() {
         </div>
       </div>
 
-      <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+      <div style={{display: 'flex', flexDirection: 'column', gap: '32px'}}>
         {/* Basic Sales Dashboard [REQ-A07] */}
-        <div className="surface-card" style={{display: 'flex', flexDirection: 'column'}}>
-          <h3 style={{marginBottom: '16px'}}>รายงานการขาย (วันนี้)</h3>
-          <div style={{background: 'var(--color-primary)', color: 'white', padding: '24px', borderRadius: 'var(--radius-md)', textAlign: 'center', marginBottom: '16px'}}>
-            <div style={{fontSize: '1.2rem'}}>รายได้รวม</div>
-            <div style={{fontSize: '3rem', fontWeight: 700}}>฿{todayRevenue}</div>
+        <div className="dashboard-card">
+          <h3 style={{marginBottom: '24px', fontFamily: 'var(--font-heading)'}}>รายงานการขาย (วันนี้)</h3>
+          <div className="revenue-badge">
+            <div style={{fontSize: '1rem', opacity: 0.9, marginBottom: '8px', fontWeight: 500}}>รายได้รวมวันนี้</div>
+            <div style={{fontSize: '3.5rem', fontWeight: 800, letterSpacing: '-1px'}}>฿{todayRevenue}</div>
           </div>
-          <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '8px'}}>
-            <span>ออเดอร์ที่สำเร็จ:</span> <strong>{completedOrders.length} รายการ</strong>
-          </div>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <span>ออเดอร์รอดำเนินการ:</span> <strong>{orders.length - completedOrders.length} รายการ</strong>
+          
+          <div style={{display: 'flex', gap: '16px'}}>
+            <div style={{flex: 1, background: 'var(--pos-bg)', padding: '20px', borderRadius: '20px', textAlign: 'center'}}>
+              <div style={{fontSize: '0.85rem', color: 'var(--color-text-light)', marginBottom: '4px'}}>ออเดอร์สำเร็จ</div>
+              <div style={{fontSize: '1.5rem', fontWeight: 800}}>{completedOrders.length}</div>
+            </div>
+            <div style={{flex: 1, background: 'var(--pos-bg)', padding: '20px', borderRadius: '20px', textAlign: 'center'}}>
+              <div style={{fontSize: '0.85rem', color: 'var(--color-text-light)', marginBottom: '4px'}}>ออเดอร์รอดำเนินการ</div>
+              <div style={{fontSize: '1.5rem', fontWeight: 800}}>{orders.length - completedOrders.length}</div>
+            </div>
           </div>
         </div>
 
         {/* Configurations Dashboard Hub */}
-        <div className="surface-card">
-          <h3 style={{marginBottom: '16px'}}>ตั้งค่าระบบ</h3>
-          <div style={{display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '12px'}}>
-            <button className="btn btn-outline" style={{display: 'flex', flexDirection: 'column', padding: '20px 8px', gap: '12px', color: 'var(--color-text)'}} onClick={() => setActiveModal('location')}>
-              <span style={{fontSize: '2rem'}}>📍</span>
-              <span style={{fontSize: '0.9rem', fontWeight: 600}}>ข้อมูลร้านค้า</span>
-            </button>
-            <button className="btn btn-outline" style={{display: 'flex', flexDirection: 'column', padding: '20px 8px', gap: '12px', color: 'var(--color-text)'}} onClick={() => setActiveModal('loyaltyRules')}>
-              <span style={{fontSize: '2rem'}}>⚙️</span>
-              <span style={{fontSize: '0.9rem', fontWeight: 600}}>กฎสะสมแต้ม</span>
-            </button>
-            <button className="btn btn-outline" style={{display: 'flex', flexDirection: 'column', padding: '20px 8px', gap: '12px', color: 'var(--color-text)'}} onClick={() => setActiveModal('manualPoints')}>
-              <span style={{fontSize: '2rem'}}>💎</span>
-              <span style={{fontSize: '0.9rem', fontWeight: 600}}>จัดการแต้ม</span>
-            </button>
+        <div className="dashboard-card">
+          <h3 style={{marginBottom: '24px', fontFamily: 'var(--font-heading)'}}>ตั้งค่าระบบ</h3>
+          <div className="setting-hub-grid">
+            <div className="setting-hub-card" onClick={() => setActiveModal('location')}>
+              <span>📍</span>
+              <span>ข้อมูลร้าน</span>
+            </div>
+            <div className="setting-hub-card" onClick={() => setActiveModal('loyaltyRules')}>
+              <span>⚙️</span>
+              <span>กฎสะสมแต้ม</span>
+            </div>
+            <div className="setting-hub-card" onClick={() => setActiveModal('manualPoints')}>
+              <span>💎</span>
+              <span>จัดการแต้ม</span>
+            </div>
           </div>
         </div>
       </div>
@@ -320,11 +338,11 @@ export default function SettingsTab() {
       {activeModal === 'location' && renderModal('จัดการสถานที่ตั้งหลัก', 
         <>
           <div className="form-group">
-            <label>ชื่อสถานที่ (เช่น ตลาดนัดจตุจักร)</label>
+            <label>ชื่อสถานที่</label>
             <input value={locName} onChange={e => setLocName(e.target.value)} />
           </div>
           <div className="form-group">
-            <label>เลขที่บูธ / โซน</label>
+            <label>เลขที่บูธ</label>
             <input value={boothNumber} onChange={e => setBoothNumber(e.target.value)} />
           </div>
           <div className="form-group">
@@ -335,14 +353,32 @@ export default function SettingsTab() {
             <label>เบอร์ PromptPay</label>
             <input value={promptpayNumber} onChange={e => setPromptpayNumber(e.target.value)} placeholder="08xxxxxxxx" />
           </div>
-          <button className="btn btn-primary full-width" onClick={handleUpdateConfigWithClose} style={{marginTop: '16px'}}>อัปเดตข้อมูลสดหน้าเว็บ</button>
+          <hr style={{margin: '20px 0', border: 'none', borderBottom: '1px solid rgba(42,36,31,0.1)'}} />
+          <h4 style={{marginBottom: '16px'}}>โซเชียลมีเดีย</h4>
+          <div className="form-group">
+            <label>Instagram User</label>
+            <input value={instagramUser} onChange={e => setInstagramUser(e.target.value)} placeholder="@username" />
+          </div>
+          <div className="form-group">
+            <label>Facebook Page Link</label>
+            <input value={facebookLink} onChange={e => setFacebookLink(e.target.value)} placeholder="URL" />
+          </div>
+          <div className="form-group">
+            <label>LINE Official ID</label>
+            <input value={lineId} onChange={e => setLineId(e.target.value)} placeholder="@lineid" />
+          </div>
+          <div className="form-group">
+            <label>TikTok User</label>
+            <input value={tiktokUser} onChange={e => setTiktokUser(e.target.value)} placeholder="@username" />
+          </div>
+          <button className="btn btn-primary full-width" onClick={handleUpdateConfigWithClose} style={{marginTop: '16px'}}>อัปเดตข้อมูลทั้งหมด</button>
         </>
       )}
 
       {activeModal === 'loyaltyRules' && renderModal('ตั้งค่าระบบสะสมแต้ม', 
         <>
           <div className="form-group">
-            <label>จำนวนบาทที่คุ้มค่าต่อ 1 แต้ม</label>
+            <label>จำนวนบาทต่อ 1 แต้ม</label>
             <input type="number" value={pointsPerBaht} onChange={e => setPointsPerBaht(Number(e.target.value))} />
           </div>
           <div className="form-group">
@@ -350,7 +386,7 @@ export default function SettingsTab() {
             <input type="number" value={discountValue} onChange={e => setDiscountValue(Number(e.target.value))} />
           </div>
           <div className="form-group">
-            <label>จำนวนแต้มที่ใช้แลกส่วนลด</label>
+            <label>แต้มที่ใช้แลกส่วนลด</label>
             <input type="number" value={discountPointsCost} onChange={e => setDiscountPointsCost(Number(e.target.value))} />
           </div>
           <hr style={{margin: '16px 0', border: 'none', borderBottom: '1px solid rgba(42,36,31,0.1)'}} />
@@ -359,14 +395,14 @@ export default function SettingsTab() {
             <input type="number" value={freeSnackPointsCost} onChange={e => setFreeSnackPointsCost(Number(e.target.value))} />
           </div>
           <div className="form-group">
-            <label>ชื่อรางวัลขนมฟรี</label>
+            <label>ชื่อขนมฟรี</label>
             <input type="text" value={freeSnackName} onChange={e => setFreeSnackName(e.target.value)} />
           </div>
           <button className="btn btn-primary full-width" onClick={handleUpdateConfigWithClose} style={{marginTop: '16px'}}>บันทึกกฎใหม่</button>
         </>
       )}
 
-      {activeModal === 'manualPoints' && renderModal('จัดการแต้มลูกค้าด้วยตนเอง', 
+      {activeModal === 'manualPoints' && renderModal('จัดการแต้มลูกค้า', 
         <>
           <div className="form-group">
             <label>เบอร์โทรศัพท์ลูกค้า</label>
@@ -374,11 +410,11 @@ export default function SettingsTab() {
           </div>
           <div className="form-group">
             <label>จำนวนแต้ม</label>
-            <input type="number" min="1" value={loyaltyAdd} onChange={e => setLoyaltyAdd(e.target.value ? Number(e.target.value) : '')} placeholder="ระบุจำนวนแต้ม" />
+            <input type="number" min="1" value={loyaltyAdd} onChange={e => setLoyaltyAdd(e.target.value ? Number(e.target.value) : '')} placeholder="ระบุแต้ม" />
           </div>
           <div style={{display: 'flex', gap: '12px', marginTop: '16px'}}>
-            <button className="btn full-width" style={{background: 'var(--color-primary)', color: 'white', border: 'none'}} onClick={() => handleManualLoyalty(true)} disabled={!loyaltyPhone || !loyaltyAdd}>+ เพิ่มแต้ม</button>
-            <button className="btn full-width" style={{background: 'var(--color-danger, #ef4444)', color: 'white', border: 'none'}} onClick={() => handleManualLoyalty(false)} disabled={!loyaltyPhone || !loyaltyAdd}>- ลดแต้ม</button>
+            <button className="btn btn-primary full-width" onClick={() => handleManualLoyalty(true)} disabled={!loyaltyPhone || !loyaltyAdd}>+ เพิ่มแต้ม</button>
+            <button className="btn full-width" style={{background: 'var(--color-secondary)', color: 'white'}} onClick={() => handleManualLoyalty(false)} disabled={!loyaltyPhone || !loyaltyAdd}>- ลดแต้ม</button>
           </div>
         </>
       )}
@@ -387,41 +423,29 @@ export default function SettingsTab() {
         <>
           <div className="form-group">
             <label>ชื่อสินค้า</label>
-            <input value={newProdName} onChange={e => setNewProdName(e.target.value)} placeholder="เช่น ชูครีมมัทฉะ" />
+            <input value={newProdName} onChange={e => setNewProdName(e.target.value)} placeholder="ชื่อสินค้า" />
           </div>
           <div className="form-group">
             <label>คำอธิบาย</label>
-            <input value={newProdDesc} onChange={e => setNewProdDesc(e.target.value)} placeholder="เช่น ไส้ชาเขียวแท้จากญี่ปุ่น" />
+            <input value={newProdDesc} onChange={e => setNewProdDesc(e.target.value)} placeholder="คำอธิบาย" />
           </div>
           <div className="form-group">
             <label>ราคา (บาท)</label>
             <input type="number" value={newProdPrice} onChange={e => setNewProdPrice(e.target.value === '' ? '' : Number(e.target.value))} />
           </div>
           <div className="form-group">
-            <label>อัปโหลดรูปภาพเมนู</label>
+            <label>รูปภาพ</label>
             <input type="file" accept="image/*" onChange={e => {
-              if (e.target.files && e.target.files[0]) {
-                setImageFile(e.target.files[0]);
-              }
-            }} style={{padding: '8px', background: 'var(--color-bg)', border: '1px solid rgba(42,36,31,0.1)', borderRadius: 'var(--radius-sm)'}} />
-            {editId && !imageFile && newProdImage && newProdImage !== '/choux_cream_hero.png' && (
-              <span style={{fontSize: '0.85rem', color: 'var(--color-text-light)', marginTop: '6px'}}>
-                ✓ มีรูปเดิมอยู่แล้ว อัปโหลดใหม่เพื่อแทนที่
-              </span>
-            )}
-            {(!editId || newProdImage === '/choux_cream_hero.png') && !imageFile && (
-              <span style={{fontSize: '0.85rem', color: 'var(--color-warning)', marginTop: '6px'}}>
-                ไม่มีรูปภาพประกอบ ระบบจะใช้รูปมาตรฐานให้
-              </span>
-            )}
+              if (e.target.files && e.target.files[0]) setImageFile(e.target.files[0]);
+            }} />
           </div>
           <button 
             className="btn btn-primary full-width" 
             onClick={handleCreateOrUpdateProduct} 
-            style={{marginTop: '16px'}} 
             disabled={!newProdName || !newProdPrice || isUploading}
+            style={{marginTop: '16px'}}
           >
-            {isUploading ? 'กำลังบันทึกข้อมูล...' : (editId ? 'บันทึกการแก้ไข' : '+ เพิ่มเข้าเมนู')}
+            {isUploading ? 'กำลังบันทึก...' : (editId ? 'บันทึกการแก้ไข' : '+ เพิ่มเมนู')}
           </button>
         </>
       )}

@@ -32,17 +32,17 @@ export default function QueueTracker() {
       
       <div className="status-timeline">
         <div className={`timeline-step ${currentStep >= 0 ? 'active' : ''}`}>
-          <div className="step-icon">📋</div>
+          <div className="step-icon">1</div>
           <p>ได้รับคำสั่งซื้อแล้ว</p>
         </div>
         <div className="timeline-connector"></div>
         <div className={`timeline-step ${currentStep >= 1 ? 'active' : ''}`}>
-          <div className="step-icon">🧑‍🍳</div>
+          <div className="step-icon">2</div>
           <p>กำลังเตรียมขนม</p>
         </div>
         <div className="timeline-connector"></div>
         <div className={`timeline-step ${currentStep >= 2 ? 'active' : ''}`}>
-          <div className="step-icon">✨</div>
+          <div className="step-icon">3</div>
           <p>พร้อมรับสินค้า!</p>
         </div>
       </div>

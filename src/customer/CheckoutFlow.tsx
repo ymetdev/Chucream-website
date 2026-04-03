@@ -35,7 +35,7 @@ export default function CheckoutFlow() {
   const discountCost = config?.discountPointsCost || 10;
   const discValue = config?.discountValue || 10;
   const freeCost = config?.freeSnackPointsCost || 50;
-  const freeName = config?.freeSnackName || '🎁 Free Premium Choux';
+  const freeName = config?.freeSnackName || 'Free Premium Choux';
 
   const subtotal = localCart.reduce((acc: number, item: any) => acc + item.priceAtPurchase * item.quantity, 0);
   const total = Math.max(0, subtotal - discount);
@@ -126,7 +126,7 @@ export default function CheckoutFlow() {
 
       {user && (
         <div style={{background: 'rgba(195, 139, 88, 0.1)', padding: '16px', borderRadius: '12px', marginBottom: '24px'}}>
-          <strong style={{color: 'var(--color-primary)', fontSize: '1.1rem'}}>✨ สมาชิก: {user.name}</strong>
+          <strong style={{color: 'var(--color-primary)', fontSize: '1.1rem'}}>สมาชิก: {user.name}</strong>
           <br/><span style={{fontSize: '0.95rem'}}>แต้มคงเหลือ: {user.points - pointsUsed} แต้ม</span>
           
           <div style={{marginTop: '16px'}}>

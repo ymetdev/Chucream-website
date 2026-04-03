@@ -1,0 +1,81 @@
+.customer-navbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 16px 20px;
+  pointer-events: none; /* Let clicks pass through if they hit the empty space */
+}
+
+.customer-navbar {
+  pointer-events: auto; /* Re-enable pointer events for the actual navbar */
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 32px;
+  background: rgba(253, 251, 247, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(197, 131, 82, 0.2);
+  border-radius: var(--radius-round);
+  box-shadow: 0 4px 16px rgba(69, 52, 36, 0.05);
+}
+
+.navbar-brand {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.navbar-link {
+  font-weight: 600;
+  color: var(--color-text-light);
+  font-size: 1rem;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.navbar-link:hover {
+  color: var(--color-primary);
+  background: rgba(197, 131, 82, 0.1);
+}
+
+/* Push down content to avoid overlapping */
+.customer-layout-content {
+  padding-top: 0px; /* Will be naturally pushed if we want, or we let hero slide under */
+}
+
+@media (max-width: 600px) {
+  .customer-navbar-wrapper {
+    padding: 12px;
+  }
+  .customer-navbar {
+    padding: 10px 20px;
+  }
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+  .navbar-links {
+    gap: 12px;
+  }
+  .navbar-link {
+    font-size: 0.9rem;
+    padding: 6px 8px;
+  }
+}

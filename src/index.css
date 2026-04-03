@@ -1,33 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Mali:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 :root {
   /* Brand Color Palette - Refined & Premium */
-  --color-primary: #C38B58; /* Signature Caramel Choux */
-  --color-primary-hover: #AB774A;
-  --color-secondary: #F4D3A1; /* Soft Cream */
-  --color-accent: #E2B961;
-  --color-bg: #FCF9F2; /* Creamy White */
+  --color-primary: #C58352; /* Warm Baked Caramel */
+  --color-primary-hover: #A66C41;
+  --color-secondary: #F0DDB3; /* Soft Cream */
+  --color-accent: #E5B25D;
+  --color-bg: #FDFBF7; /* Flour / Linen White */
   --color-surface: #FFFFFF;
-  --color-text: #2A241F; /* Dark Coffee */
-  --color-text-light: #706354;
+  --color-text: #453424; /* Dark Choco */
+  --color-text-light: #8B7A6A; /* Milk Choco */
   
   /* Status Colors */
-  --color-success: #538048;
-  --color-danger: #C24242;
-  --color-warning: #D98C22;
+  --color-success: #67925B;
+  --color-danger: #C85C5C;
+  --color-warning: #DCA342;
 
   /* Typography */
   --font-family: 'IBM Plex Sans Thai', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Mali', cursive;
   
   /* Effects */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
   --radius-round: 999px;
-  --shadow-sm: 0 2px 4px rgba(42, 36, 31, 0.05);
-  --shadow-md: 0 8px 16px rgba(42, 36, 31, 0.08);
-  --shadow-lg: 0 16px 32px rgba(42, 36, 31, 0.1);
-  --shadow-glow: 0 4px 20px rgba(195, 139, 88, 0.3);
+  --shadow-sm: 0 4px 10px rgba(69, 52, 36, 0.04);
+  --shadow-md: 0 12px 24px rgba(69, 52, 36, 0.06);
+  --shadow-lg: 0 20px 40px rgba(69, 52, 36, 0.08);
+  --shadow-glow: 0 4px 20px rgba(197, 131, 82, 0.3);
   
   /* Transitions */
   --transition-fast: 0.15s ease;
@@ -51,9 +52,10 @@ body {
 
 /* Beautiful Heading Typography */
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
   font-weight: 700;
   color: var(--color-text);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
 }
 
 a {
@@ -153,17 +155,22 @@ input::placeholder {
 }
 
 /* Card Surface */
-.surface-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: 24px;
-  transition: transform var(--transition-normal);
-}
-
 .surface-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* Paper/Linen Box Utility */
+.paper-box {
+  background: #FFFAF0; /* Warm Paper */
+  border: 2px dashed #DCCDBA;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  position: relative;
+}
+
+.dashed-border {
+  border: 2px dashed rgba(197, 131, 82, 0.2);
 }
 
 /* Dynamic Animations */

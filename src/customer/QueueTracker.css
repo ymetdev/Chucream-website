@@ -20,36 +20,50 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  opacity: 0.4;
+  opacity: 0.5;
   transition: all var(--transition-normal);
-  width: 100px;
+  width: 120px;
 }
 
 .timeline-step.active {
   opacity: 1;
-  transform: scale(1.05);
+  transform: translateY(-5px);
 }
 
 .step-icon {
-  font-size: 2.5rem;
-  background: var(--color-surface);
-  width: 70px;
-  height: 70px;
+  font-size: 2rem;
+  font-family: var(--font-heading);
+  background: #FFFAF0;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 12px;
+  border: 3px dashed #DCCDBA;
+  margin-bottom: 16px;
+  color: var(--color-text-light);
+  font-weight: 700;
+  transition: all var(--transition-normal);
 }
 
 .timeline-step.active .step-icon {
-  box-shadow: 0 0 15px rgba(195, 139, 88, 0.4);
+  background: var(--color-primary);
+  color: white;
+  border: 3px solid var(--color-primary);
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
 }
 
 .timeline-connector {
   flex-grow: 1;
-  height: 4px;
-  background: rgba(0,0,0,0.05);
-  margin-top: -30px;
+  height: 2px;
+  background: transparent;
+  border-bottom: 3px dotted #DCCDBA;
+  margin-top: -40px;
+  opacity: 0.3;
+}
+
+.timeline-step.active + .timeline-connector {
+  opacity: 0.8;
 }

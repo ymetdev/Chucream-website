@@ -42,6 +42,11 @@ export interface StoreConfig {
   discountValue?: number;
   freeSnackPointsCost?: number;
   freeSnackName?: string;
+  /* Social Media Links [NEW] */
+  instagramUser?: string;
+  facebookLink?: string;
+  lineId?: string;
+  tiktokUser?: string;
   updatedAt: number;
 }
 
@@ -49,4 +54,12 @@ export interface UserTarget {
   phoneNumber: string; // Serving as ID
   points: number;
   name?: string;
+}
+
+export interface Review {
+  id: string;
+  name: string;
+  content: string;
+  rating: number; // 1-5
+  createdAt: number;
 }

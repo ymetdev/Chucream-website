@@ -132,151 +132,168 @@ export default function POSTab() {
     <div className="pos-layout anim-slide-up">
       {/* Menu / Catalog */}
       <div className="pos-menu">
-        <h3 style={{marginBottom: '16px'}}>รายการสินค้า</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
+        <h2 style={{marginBottom: '24px', fontFamily: 'var(--font-heading)'}}>รายการสินค้า</h2>
+        <div className="pos-grid">
           {products.map(p => (
-            <button 
+            <div 
               key={p.id} 
-              className="surface-card pos-item-btn"
-              onClick={() => addToCart(p)}
-              disabled={p.stockStatus === 'sold_out' || p.stockStatus === 'unavailable'}
-              style={{
-                textAlign: 'left', 
-                opacity: (p.stockStatus === 'sold_out' || p.stockStatus === 'unavailable') ? 0.5 : 1,
-                border: '1px solid var(--color-accent)',
-                padding: '16px',
-                transition: 'transform 0.1s'
-              }}
+              className={`pos-item-card ${(p.stockStatus === 'sold_out' || p.stockStatus === 'unavailable') ? 'disabled' : ''}`}
+              onClick={() => (p.stockStatus !== 'sold_out' && p.stockStatus !== 'unavailable') && addToCart(p)}
             >
-              <img src={p.imageUrl || '/choux_cream_hero.png'} alt={p.name} style={{width: '100%', height: '120px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', marginBottom: '16px'}} />
-              <div style={{fontWeight: '700', fontSize: '1.1rem', marginBottom: '8px', lineHeight: 1.2}}>{p.name}</div>
-              <div style={{color: 'var(--color-primary)', fontWeight: '600'}}>฿{p.price}</div>
-              {p.stockStatus === 'low_stock' && <div className="badge badge-warning" style={{marginTop: '12px', fontSize: '0.7rem'}}>ของใกล้หมด</div>}
-              {p.stockStatus === 'sold_out' && <div className="badge badge-danger" style={{marginTop: '12px', fontSize: '0.7rem'}}>สินค้าหมด</div>}
-              {p.stockStatus === 'unavailable' && <div className="badge" style={{marginTop: '12px', fontSize: '0.7rem', background: '#9ca3af', color: 'white'}}>งดจำหน่ายชั่วคราว</div>}
-            </button>
+              <img src={p.imageUrl || '/choux_cream_hero.png'} alt={p.name} />
+              <div className="pos-item-name">{p.name}</div>
+              <div className="pos-item-price">฿{p.price}</div>
+              
+              {p.stockStatus === 'low_stock' && <div className="badge badge-warning" style={{marginTop: '8px', fontSize: '0.7rem'}}>ของใกล้หมด</div>}
+              {p.stockStatus === 'sold_out' && <div className="badge badge-danger" style={{marginTop: '8px', fontSize: '0.7rem'}}>สินค้าหมด</div>}
+              {p.stockStatus === 'unavailable' && <div className="badge" style={{marginTop: '8px', fontSize: '0.7rem', background: '#9ca3af', color: 'white'}}>งดจำหน่าย</div>}
+            </div>
           ))}
         </div>
       </div>
 
       {/* Ticket / Cart */}
-      <div className="surface-card pos-ticket" style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+      <div className="pos-ticket">
         {!showQR ? (
           <>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #ddd', paddingBottom: '16px', marginBottom: '16px'}}>
+            <div className="ticket-header">
               <h3 style={{margin: 0}}>รายการสั่งซื้อ</h3>
               {cart.length > 0 && (
                 <button 
-                  className="btn btn-outline" 
-                  style={{padding: '6px 12px', fontSize: '0.9rem', color: 'var(--color-danger)', borderColor: 'var(--color-danger)', borderRadius: 'var(--radius-sm)'}}
+                  className="btn-text" 
+                  style={{color: 'var(--color-danger)', fontSize: '0.9rem', fontWeight: 600}}
                   onClick={() => { setCart([]); setCustomerPhone(''); setUser(null); setDiscount(0); setPointsUsed(0); setManualDiscountValue(''); }}
                 >
-                  ล้างทั้งหมด
+                  ล้างรายการ
                 </button>
               )}
             </div>
             
-            <div style={{flexGrow: 1, overflowY: 'auto'}}>
+            <div className="ticket-items">
               {cart.map((item, idx) => (
-                <div key={idx} style={{display: 'flex', justifyContent: 'space-between', padding: '12px', borderBottom: '1px solid rgba(42,36,31,0.05)', alignItems: 'center'}}>
-                  <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <span style={{fontWeight: 500}}>{item.product.name}</span>
-                    <strong style={{color: 'var(--color-primary)'}}>฿{item.priceAtPurchase * item.quantity}</strong>
+                <div key={idx} className="ticket-item">
+                  <div className="ticket-item-info">
+                    <span style={{fontWeight: 600, fontSize: '1rem'}}>{item.product.name}</span>
+                    <span style={{color: 'var(--color-text-light)', fontSize: '0.85rem'}}>฿{item.priceAtPurchase} × {item.quantity}</span>
                   </div>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--color-bg)', padding: '4px', borderRadius: 'var(--radius-round)'}}>
-                    <button className="badge" onClick={() => handleUpdateQty(item.productId, -1)} style={{cursor: 'pointer', background: 'var(--color-surface)', border: '1px solid #ddd', padding: '4px 10px', color: 'var(--color-text)'}} type="button">-</button>
-                    <span style={{fontWeight: 700, minWidth: '24px', textAlign: 'center'}}>{item.quantity}</span>
-                    <button className="badge" onClick={() => handleUpdateQty(item.productId, 1)} style={{cursor: 'pointer', background: 'var(--color-primary)', color: 'white', padding: '4px 10px'}} type="button">+</button>
+                  <div className="qty-control">
+                    <button className="qty-btn minus" onClick={() => handleUpdateQty(item.productId, -1)}>-</button>
+                    <span style={{fontWeight: 700, minWidth: '20px', textAlign: 'center'}}>{item.quantity}</span>
+                    <button className="qty-btn plus" onClick={() => handleUpdateQty(item.productId, 1)}>+</button>
                   </div>
                 </div>
               ))}
-              {cart.length === 0 && <div style={{color: 'var(--color-text-light)', textAlign: 'center', margin: '40px 0'}}>ยังไม่มีรายการ... กดเลือกสินค้าเพื่อสั่งซื้อ</div>}
+              {cart.length === 0 && (
+                <div style={{textAlign: 'center', padding: '60px 0', opacity: 0.4}}>
+                  <div style={{fontSize: '3rem', marginBottom: '12px'}}>🛒</div>
+                  <p>ยังไม่มีรายการสินค้า</p>
+                </div>
+              )}
             </div>
 
-            <div style={{borderTop: '1px solid #ddd', paddingTop: '16px', marginTop: '16px'}}>
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
-                <div style={{fontSize: '1.1rem', fontWeight: 600}}>ยอดรวม: ฿{subtotal}</div>
+            <div className="ticket-summary">
+              <div className="summary-row">
+                <span>ยอดรวม</span>
+                <span>฿{subtotal}</span>
+              </div>
+              
+              <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
                 <button 
-                  className="badge" 
-                  style={{background: 'var(--color-bg)', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', cursor: 'pointer', padding: '6px 12px'}} 
+                  className="btn btn-outline" 
+                  style={{padding: '8px 12px', fontSize: '0.85rem', flex: 1}} 
                   onClick={() => setShowDiscountModal(true)}
                   disabled={cart.length === 0}
                 >
                   🏷️ เพิ่มส่วนลด
                 </button>
               </div>
-              <div style={{fontSize: '1.2rem', fontWeight: 600, marginBottom: '16px'}}>
-                {discount > 0 && <div style={{color: 'var(--color-danger)', fontSize: '1rem', fontWeight: 500}}>แต้มส่วนลด: -฿{discount}</div>}
-                {manualDiscountAmt > 0 && <div style={{color: 'var(--color-danger)', fontSize: '1rem', fontWeight: 500}}>ส่วนลดพิเศษ: -฿{manualDiscountAmt.toFixed(2)} {manualDiscountType === 'percent' && `(${manualDiscountValue}%)`}</div>}
-                <div style={{fontSize: '1.4rem', marginTop: '8px'}}>ยอดสุทธิ: ฿{total}</div>
+
+              {(discount > 0 || manualDiscountAmt > 0) && (
+                <div style={{background: 'rgba(231, 76, 60, 0.05)', padding: '12px', borderRadius: '12px', marginBottom: '16px'}}>
+                  {discount > 0 && <div className="summary-row" style={{color: 'var(--color-danger)', marginBottom: '4px'}}>
+                    <span>แต้มส่วนลด</span>
+                    <span>-฿{discount}</span>
+                  </div>}
+                  {manualDiscountAmt > 0 && <div className="summary-row" style={{color: 'var(--color-danger)', margin: 0}}>
+                    <span>ส่วนลด ({manualDiscountType === 'percent' ? manualDiscountValue+'%' : 'พิเศษ'})</span>
+                    <span>-฿{manualDiscountAmt.toFixed(2)}</span>
+                  </div>}
+                </div>
+              )}
+
+              <div className="total-row">
+                <span>สุทธิ</span>
+                <div>฿{total}</div>
               </div>
 
-              <div className="form-group" style={{marginBottom: '16px'}}>
+              <div className="form-group" style={{marginTop: '24px', marginBottom: '16px'}}>
                 <input 
                   type="text" 
-                  placeholder="เบอร์โทรศัพท์ลูกค้า (สำหรับสะสมแต้ม)" 
+                  placeholder="เบอร์โทรศัพท์ลูกค้า..." 
                   value={customerPhone}
                   onChange={e => setCustomerPhone(e.target.value)}
                   onBlur={handlePhoneCheck}
-                  style={{padding: '16px', fontSize: '1rem'}}
+                  style={{
+                    background: '#f8f9fa',
+                    border: '1px solid var(--pos-border)',
+                    padding: '16px',
+                    borderRadius: '16px',
+                    fontSize: '1rem'
+                  }}
                 />
               </div>
+
               {user && (
-                <div style={{marginTop: '12px', padding: '12px', background: 'var(--color-bg)', borderRadius: 'var(--radius-sm)'}}>
-                  <strong style={{color: 'var(--color-primary)'}}>คุณลูกค้า: {user.name}</strong>
-                  <br/>แต้มสะสม: {user.points - pointsUsed}
+                <div style={{padding: '16px', background: 'var(--color-bg)', borderRadius: '20px', border: '1px solid var(--pos-accent)', marginBottom: '16px'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+                    <div>
+                      <div style={{fontWeight: 700, color: 'var(--color-primary)'}}>{user.name}</div>
+                      <div style={{fontSize: '0.85rem', opacity: 0.6}}>สะสมอยู่: {user.points - pointsUsed} แต้ม</div>
+                    </div>
+                  </div>
                   
-                  <div style={{display: 'flex', gap: '8px', marginTop: '12px', alignItems: 'center'}}>
-                    <button className="btn btn-primary" style={{padding: '8px', fontSize: '0.85rem', flex: 1}} onClick={handleRedeemDiscount} disabled={user.points - pointsUsed < 10}>
-                      ลด ฿10<br/>(10 แต้ม)
+                  <div style={{display: 'flex', gap: '8px'}}>
+                    <button className="btn btn-primary" style={{padding: '8px', fontSize: '0.8rem', flex: 1, borderRadius: '10px'}} onClick={handleRedeemDiscount} disabled={user.points - pointsUsed < 10}>
+                      ลด ฿10 (10แต้ม)
                     </button>
-                    <button className="btn btn-primary" style={{padding: '8px', fontSize: '0.85rem', flex: 1}} onClick={handleRedeemFreeItem} disabled={user.points - pointsUsed < 50}>
-                      รับฟรี!<br/>(50 แต้ม)
+                    <button className="btn btn-primary" style={{padding: '8px', fontSize: '0.8rem', flex: 1, borderRadius: '10px'}} onClick={handleRedeemFreeItem} disabled={user.points - pointsUsed < 50}>
+                      แถมฟรี! (50แต้ม)
                     </button>
-                    {pointsUsed > 0 && (
-                      <button className="btn btn-outline" style={{padding: '8px', fontSize: '0.85rem', color: 'var(--color-danger)', borderColor: 'var(--color-danger)'}} onClick={() => { setDiscount(0); setPointsUsed(0); setCart(cart.filter(c => c.productId !== 'free_reward')); }}>
-                         ยกเลิก
-                      </button>
-                    )}
                   </div>
                 </div>
               )}
 
-              <div style={{display: 'flex', gap: '12px', marginTop: 'auto'}}>
+              <div className="checkout-actions">
                 <button 
-                  className="btn btn-outline" 
-                  style={{flex: 1, padding: '16px', fontSize: '1.2rem', borderColor: 'var(--color-success)', color: 'var(--color-success)'}}
+                  className="btn btn-checkout btn-cash" 
                   onClick={() => setShowCashConfirm(true)}
                   disabled={isProcessing || cart.length === 0}
                 >
-                  💵 เงินสด
+                  Cash
                 </button>
                 <button 
-                  className="btn btn-primary" 
-                  style={{flex: 1, padding: '16px', fontSize: '1.2rem'}}
+                  className="btn btn-checkout btn-qr" 
                   onClick={() => setShowQR(true)}
                   disabled={isProcessing || cart.length === 0}
                 >
-                  📱 QR Pay
+                  QR Pay
                 </button>
               </div>
             </div>
           </>
         ) : (
           <div style={{textAlign: 'center', display: 'flex', flexDirection: 'column', height: '100%'}}>
-            <h3>สแกนจ่ายด้วย PromptPay</h3>
-            <p style={{color: 'var(--color-text-light)', marginBottom: '24px'}}>ยอดที่ต้องชำระ: ฿{total}</p>
+            <button className="btn-text" onClick={() => setShowQR(false)} style={{alignSelf: 'flex-start', marginBottom: '20px'}}>← กลับไปแก้ไข</button>
+            <h2 style={{fontFamily: 'var(--font-heading)'}}>PromptPay Payment</h2>
+            <div style={{fontSize: '2.5rem', fontWeight: 800, color: 'var(--color-primary)', margin: '16px 0'}}>฿{total}</div>
             
-            <div style={{flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-               <img src={`https://promptpay.io/${config?.promptpayNumber || '0800000000'}/${total}.png`} alt="PromptPay QR" width="250" style={{borderRadius: '16px', boxShadow: 'var(--shadow-sm)'}} />
+            <div style={{flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'white', borderRadius: '24px', padding: '24px', border: '1px solid var(--pos-border)'}}>
+               <img src={`https://promptpay.io/${config?.promptpayNumber || '0800000000'}/${total}.png`} alt="PromptPay QR" width="240" style={{mixBlendMode: 'multiply'}} />
             </div>
 
-            <div style={{display: 'flex', gap: '12px', marginTop: '24px'}}>
-              <button className="btn btn-outline full-width" onClick={() => setShowQR(false)}>ย้อนกลับ</button>
-              <button className="btn btn-primary full-width" onClick={() => handleCheckoutSubmit('promptpay')} disabled={isProcessing}>
-                {isProcessing ? 'กำลังบันทึก...' : 'ยืนยันการโอนเงิน'}
-              </button>
-            </div>
+            <button className="btn btn-primary full-width" style={{marginTop: '32px', padding: '20px', borderRadius: '20px', fontSize: '1.2rem'}} onClick={() => handleCheckoutSubmit('promptpay')} disabled={isProcessing}>
+              {isProcessing ? 'กำลังบันทึก...' : 'ยืนยันการรับเงิน'}
+            </button>
           </div>
         )}
       </div>
