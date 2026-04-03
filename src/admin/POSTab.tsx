@@ -152,6 +152,7 @@ export default function POSTab() {
               <div style={{fontWeight: '700', fontSize: '1.1rem', marginBottom: '8px', lineHeight: 1.2}}>{p.name}</div>
               <div style={{color: 'var(--color-primary)', fontWeight: '600'}}>฿{p.price}</div>
               {p.stockStatus === 'low_stock' && <div className="badge badge-warning" style={{marginTop: '12px', fontSize: '0.7rem'}}>ของใกล้หมด</div>}
+              {p.stockStatus === 'sold_out' && <div className="badge badge-danger" style={{marginTop: '12px', fontSize: '0.7rem'}}>สินค้าหมด</div>}
               {p.stockStatus === 'unavailable' && <div className="badge" style={{marginTop: '12px', fontSize: '0.7rem', background: '#9ca3af', color: 'white'}}>งดจำหน่ายชั่วคราว</div>}
             </button>
           ))}

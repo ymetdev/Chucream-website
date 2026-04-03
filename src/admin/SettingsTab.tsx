@@ -236,11 +236,22 @@ export default function SettingsTab() {
           </div>
           <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
             {products.map(p => (
-              <div key={p.id} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--color-bg)', borderRadius: 'var(--radius-sm)'}}>
+              <div key={p.id} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', 
+                background: p.stockStatus === 'unavailable' ? 'rgba(0,0,0,0.02)' : 'var(--color-bg)', 
+                borderRadius: 'var(--radius-sm)',
+                opacity: p.stockStatus === 'unavailable' ? 0.8 : 1,
+                border: p.stockStatus === 'unavailable' ? '1px dashed #ccc' : '1px solid transparent',
+                transition: 'all 0.2s'
+              }}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                  <img src={p.imageUrl || '/choux_cream_hero.png'} alt={p.name} style={{width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover'}} />
+                  <img src={p.imageUrl || '/choux_cream_hero.png'} alt={p.name} style={{
+                    width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover',
+                    filter: p.stockStatus === 'unavailable' ? 'grayscale(100%)' : 'none',
+                    opacity: p.stockStatus === 'unavailable' ? 0.5 : 1
+                  }} />
                   <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <span style={{fontWeight: 600}}>{p.name}</span>
+                    <span style={{fontWeight: 600, color: p.stockStatus === 'unavailable' ? 'var(--color-text-light)' : 'var(--color-text)', textDecoration: p.stockStatus === 'unavailable' ? 'line-through' : 'none'}}>{p.name}</span>
                     <span style={{fontSize: '0.85rem', color: 'var(--color-text-light)'}}>฿{p.price}</span>
                   </div>
                 </div>
@@ -253,14 +264,14 @@ export default function SettingsTab() {
                   </button>
                   <select 
                     className={`badge ${p.stockStatus === 'available' ? 'badge-success' : p.stockStatus === 'low_stock' ? 'badge-warning' : p.stockStatus === 'unavailable' ? 'badge-secondary' : 'badge-danger'}`}
-                    style={{cursor: 'pointer', border: 'none', padding: '6px 12px', outline: 'none', background: p.stockStatus === 'unavailable' ? '#9ca3af' : undefined, color: p.stockStatus === 'unavailable' ? 'white' : undefined, fontSize: '0.85rem'}}
+                    style={{cursor: 'pointer', border: 'none', padding: '6px 12px', outline: 'none', background: p.stockStatus === 'unavailable' ? '#9ca3af' : undefined, color: p.stockStatus === 'unavailable' ? 'white' : undefined, fontSize: '0.9rem', fontWeight: 600}}
                     value={p.stockStatus}
                     onChange={(e) => handleToggleStock(p.id, e.target.value)}
                   >
-                    <option value="available" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>มีสินค้า</option>
-                    <option value="low_stock" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>ใกล้หมด</option>
-                    <option value="sold_out" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>หมด</option>
-                    <option value="unavailable" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>งดจำหน่ายชั่วคราว</option>
+                    <option value="available" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>🟢 มีสินค้า</option>
+                    <option value="low_stock" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>🟡 ใกล้หมด</option>
+                    <option value="sold_out" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>🔴 หมด</option>
+                    <option value="unavailable" style={{background: 'var(--color-bg)', color: 'var(--color-text)'}}>⚪ งดจำหน่ายชั่วคราว</option>
                   </select>
                 </div>
               </div>
