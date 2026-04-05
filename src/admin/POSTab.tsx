@@ -113,6 +113,8 @@ export default function POSTab() {
       
       const { queueNumber } = await createOrder(orderData);
       
+      notify('ส่งออเดอร์ไปที่ห้องครัวแล้ว!', 'success');
+      
       setCart([]);
       setCustomerPhone('');
       setUser(null);
@@ -307,11 +309,19 @@ export default function POSTab() {
             </div>
             <p style={{color: 'var(--color-text-light)', marginBottom: '32px', fontSize: '1.05rem'}}>คุณได้รับเงินสดจากลูกค้าครบถ้วนแล้วใช่ไหม?</p>
             <div style={{display: 'flex', gap: '12px'}}>
-              <button className="btn btn-outline" onClick={() => setShowCashConfirm(false)} style={{flex: 1, padding: '16px', fontSize: '1.1rem'}}>
+              <button className="btn btn-outline" onClick={() => setShowCashConfirm(false)} style={{flex: 1, padding: '16px', fontSize: '1.1rem'}} disabled={isProcessing}>
                 ยกเลิก
               </button>
-              <button className="btn btn-primary" onClick={() => { setShowCashConfirm(false); handleCheckoutSubmit('cash'); }} style={{flex: 1, padding: '16px', fontSize: '1.1rem', background: 'var(--color-success)'}}>
-                ยืนยันการจ่ายเงิน
+              <button 
+                className="btn btn-primary" 
+                onClick={async () => { 
+                  await handleCheckoutSubmit('cash'); 
+                  setShowCashConfirm(false); 
+                }} 
+                style={{flex: 1, padding: '16px', fontSize: '1.1rem', background: 'var(--color-success)'}}
+                disabled={isProcessing}
+              >
+                {isProcessing ? 'กำลังบันทึก...' : 'ยืนยันการจ่ายเงิน'}
               </button>
             </div>
           </div>
