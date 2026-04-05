@@ -68,7 +68,7 @@ export default function CheckoutFlow() {
         await addLoyaltyPoints(customerPhone, netPoints);
       }
 
-      const orderData: Omit<Order, 'id'> = {
+      const orderData: Omit<Order, 'id' | 'queueNumber'> = {
         customerPhone: customerPhone || '',
         customerName: user?.name || 'Walk-in',
         items: localCart.map((c: any) => ({
