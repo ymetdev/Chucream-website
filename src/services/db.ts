@@ -54,6 +54,15 @@ export const subscribeToReviews = (callback: (reviews: any[]) => void) => {
   });
 }
 
+export const subscribeToUsers = (callback: (users: UserTarget[]) => void) => {
+  const usersCollection = collection(db, 'users');
+  const q = query(usersCollection, orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const users = snapshot.docs.map(doc => ({ phoneNumber: doc.id, ...doc.data() } as UserTarget));
+    callback(users);
+  });
+};
+
 // Basic Operations
 export const toggleProductAvailability = async (productId: string, stockStatus: string, isActive?: boolean) => {
   const docRef = doc(db, 'products', productId);
@@ -121,14 +130,20 @@ export const getUserByPhone = async (phoneNumber: string) => {
   return null;
 };
 
-export const addLoyaltyPoints = async (phoneNumber: string, pointsToAdd: number, name?: string) => {
+export const addLoyaltyPoints = async (phoneNumber: string, pointsToAdd: number, name?: string, nickname?: string, age?: number) => {
   const docRef = doc(db, 'users', phoneNumber);
   const snapshot = await getDoc(docRef);
   if (snapshot.exists()) {
     const currentPoints = snapshot.data().points || 0;
     await updateDoc(docRef, { points: currentPoints + pointsToAdd });
   } else {
-    await setDoc(docRef, { points: pointsToAdd, name: name || 'Customer' });
+    await setDoc(docRef, { 
+      points: pointsToAdd, 
+      name: name || 'Customer',
+      nickname: nickname || '',
+      age: age || 0,
+      createdAt: Date.now()
+    });
   }
 };
 

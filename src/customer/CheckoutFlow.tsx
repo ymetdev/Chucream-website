@@ -17,6 +17,8 @@ export default function CheckoutFlow() {
   const [localCart, setLocalCart] = useState<any[]>(cartItems || []);
   const [discount, setDiscount] = useState(0);
   const [pointsUsed, setPointsUsed] = useState(0);
+  const [nickname, setNickname] = useState('');
+  const [age, setAge] = useState<number | ''>('');
 
   useEffect(() => {
     const unsubC = subscribeToStoreConfig(setConfig);
@@ -65,7 +67,7 @@ export default function CheckoutFlow() {
       const pointsEarned = Math.floor(total / pbRatio);
       const netPoints = pointsEarned - pointsUsed;
       if (netPoints !== 0 && customerPhone) {
-        await addLoyaltyPoints(customerPhone, netPoints);
+        await addLoyaltyPoints(customerPhone, netPoints, nickname || 'Customer', nickname, Number(age) || 0);
       }
 
       const orderData: Omit<Order, 'id' | 'queueNumber'> = {
@@ -125,7 +127,7 @@ export default function CheckoutFlow() {
       </div>
 
       {user && (
-        <div style={{background: 'rgba(195, 139, 88, 0.1)', padding: '16px', borderRadius: '12px', marginBottom: '24px'}}>
+        <div style={{background: 'rgba(107, 91, 149, 0.1)', padding: '16px', borderRadius: '12px', marginBottom: '24px'}}>
           <strong style={{color: 'var(--color-primary)', fontSize: '1.1rem'}}>สมาชิก: {user.name}</strong>
           <br/><span style={{fontSize: '0.95rem'}}>แต้มคงเหลือ: {user.points - pointsUsed} แต้ม</span>
           
@@ -161,6 +163,39 @@ export default function CheckoutFlow() {
           </div>
         </div>
       )}
+      {!user && (
+        <div className="surface-card registration-card anim-slide-up">
+          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px'}}>
+            <div style={{background: 'var(--color-primary)', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold'}}>!</div>
+            <h3 style={{margin: 0}}>สมัครสมาชิกสะสมแต้ม</h3>
+          </div>
+          <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '20px'}}>ดูเหมือนว่าคุณยังไม่ได้เป็นสมาชิก ของเรา กรุณากรอกข้อมูลเพื่อรับสิทธิพิเศษและสะสมแต้มครับ</p>
+          
+          <div className="form-grid">
+            <div className="form-group">
+              <label>ชื่อเล่นของคุณ</label>
+              <input 
+                type="text" 
+                placeholder="เช่น น้องชู" 
+                value={nickname} 
+                onChange={e => setNickname(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>อายุ (ปี)</label>
+              <input 
+                type="number" 
+                placeholder="เช่น 25" 
+                value={age} 
+                onChange={e => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                required
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
         <p className="pickup-time">เวลานัดรับสินค้า: <strong>{pickupTime}</strong></p>
       </div>
 

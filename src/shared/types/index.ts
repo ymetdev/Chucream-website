@@ -55,6 +55,8 @@ export interface UserTarget {
   phoneNumber: string; // Serving as ID
   points: number;
   name?: string;
+  nickname?: string;
+  age?: number;
 }
 
 export interface Review {

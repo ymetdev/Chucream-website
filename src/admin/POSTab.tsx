@@ -11,6 +11,7 @@ export default function POSTab() {
   const [customerPhone, setCustomerPhone] = useState('');
   const [user, setUser] = useState<UserTarget | null>(null);
   const [config, setConfig] = useState<StoreConfig | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [discount, setDiscount] = useState(0);
   const [pointsUsed, setPointsUsed] = useState(0);
   
@@ -22,19 +23,30 @@ export default function POSTab() {
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [manualDiscountType, setManualDiscountType] = useState<'baht' | 'percent'>('baht');
   const [manualDiscountValue, setManualDiscountValue] = useState<number | ''>('');
+  const [nickname, setNickname] = useState('');
+  const [age, setAge] = useState<number | ''>('');
 
   useEffect(() => {
-    const unsub = subscribeToProducts(setProducts);
-    const unsubC = subscribeToStoreConfig(setConfig);
+    let productsLoaded = false;
+    let configLoaded = false;
+    const checkLoading = () => { if(productsLoaded && configLoaded) setIsLoading(false); };
+
+    const unsub = subscribeToProducts(list => { setProducts(list); productsLoaded = true; checkLoading(); });
+    const unsubC = subscribeToStoreConfig(c => { setConfig(c); configLoaded = true; checkLoading(); });
     return () => { unsub(); unsubC(); };
   }, []);
 
-  const handlePhoneCheck = async () => {
-    if (customerPhone.length >= 9) {
-      const u = await getUserByPhone(customerPhone);
-      setUser(u);
-    }
-  };
+  useEffect(() => {
+    const checkPhone = async () => {
+      if (customerPhone.length >= 10) {
+        const u = await getUserByPhone(customerPhone);
+        setUser(u);
+      } else {
+        setUser(null);
+      }
+    };
+    checkPhone();
+  }, [customerPhone]);
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -50,7 +62,7 @@ export default function POSTab() {
   const discountCost = config?.discountPointsCost || 10;
   const discValue = config?.discountValue || 10;
   const freeCost = config?.freeSnackPointsCost || 50;
-  const freeName = config?.freeSnackName || '🎁 Free Premium Choux';
+  const freeName = config?.freeSnackName || 'Reward: Free Premium Choux';
 
   const handleRedeemDiscount = () => {
     if (user && user.points - pointsUsed >= discountCost) {
@@ -92,7 +104,7 @@ export default function POSTab() {
       const pointsEarned = Math.floor(total / pbRatio);
       const netPoints = pointsEarned - pointsUsed;
       if (netPoints !== 0 && customerPhone) {
-        await addLoyaltyPoints(customerPhone, netPoints);
+        await addLoyaltyPoints(customerPhone, netPoints, nickname || 'Customer', nickname, Number(age) || 0);
       }
 
       const orderData = {
@@ -118,6 +130,8 @@ export default function POSTab() {
       setCart([]);
       setCustomerPhone('');
       setUser(null);
+      setNickname('');
+      setAge('');
       setDiscount(0);
       setPointsUsed(0);
       setManualDiscountValue('');
@@ -129,6 +143,10 @@ export default function POSTab() {
     }
     setIsProcessing(false);
   };
+
+  if (isLoading) {
+    return <div className="loading-state" style={{marginTop: '40px', fontSize: '1.2rem', fontWeight: 600}}>กำลังโหลดเครื่อง POS...</div>;
+  }
 
   return (
     <div className="pos-layout anim-slide-up">
@@ -187,7 +205,7 @@ export default function POSTab() {
               ))}
               {cart.length === 0 && (
                 <div style={{textAlign: 'center', padding: '60px 0', opacity: 0.4}}>
-                  <div style={{fontSize: '3rem', marginBottom: '12px'}}>🛒</div>
+                  <div style={{fontSize: '3rem', marginBottom: '12px', color: 'var(--color-primary)', opacity: 0.2}}>Cart</div>
                   <p>ยังไม่มีรายการสินค้า</p>
                 </div>
               )}
@@ -211,12 +229,12 @@ export default function POSTab() {
               </div>
 
               {(discount > 0 || manualDiscountAmt > 0) && (
-                <div style={{background: 'rgba(231, 76, 60, 0.05)', padding: '12px', borderRadius: '12px', marginBottom: '16px'}}>
-                  {discount > 0 && <div className="summary-row" style={{color: 'var(--color-danger)', marginBottom: '4px'}}>
+                <div style={{background: 'rgba(37, 99, 235, 0.05)', padding: '12px', borderRadius: '12px', marginBottom: '16px'}}>
+                  {discount > 0 && <div className="summary-row" style={{color: 'var(--color-primary)', marginBottom: '4px'}}>
                     <span>แต้มส่วนลด</span>
                     <span>-฿{discount}</span>
                   </div>}
-                  {manualDiscountAmt > 0 && <div className="summary-row" style={{color: 'var(--color-danger)', margin: 0}}>
+                  {manualDiscountAmt > 0 && <div className="summary-row" style={{color: 'var(--color-primary)', margin: 0}}>
                     <span>ส่วนลด ({manualDiscountType === 'percent' ? manualDiscountValue+'%' : 'พิเศษ'})</span>
                     <span>-฿{manualDiscountAmt.toFixed(2)}</span>
                   </div>}
@@ -229,27 +247,36 @@ export default function POSTab() {
               </div>
 
               <div className="form-group" style={{marginTop: '24px', marginBottom: '16px'}}>
+                <label style={{fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '12px', display: 'block'}}>
+                  ข้อมูลลูกค้า (สะสมแต้ม)
+                </label>
                 <input 
                   type="text" 
-                  placeholder="เบอร์โทรศัพท์ลูกค้า..." 
+                  placeholder="กรอกเบอร์โทรศัพท์ 10 หลัก..." 
                   value={customerPhone}
                   onChange={e => setCustomerPhone(e.target.value)}
-                  onBlur={handlePhoneCheck}
                   style={{
                     background: '#f8f9fa',
                     border: '1px solid var(--pos-border)',
                     padding: '16px',
                     borderRadius: '16px',
-                    fontSize: '1rem'
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    textAlign: 'center',
+                    letterSpacing: '1px'
                   }}
                 />
               </div>
 
-              {user && (
+              {user ? (
                 <div style={{padding: '16px', background: 'var(--color-bg)', borderRadius: '20px', border: '1px solid var(--pos-accent)', marginBottom: '16px'}}>
                   <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
                     <div>
-                      <div style={{fontWeight: 700, color: 'var(--color-primary)'}}>{user.name}</div>
+                      <div style={{fontWeight: 700, color: 'var(--color-primary)'}}>
+                        {user.nickname || user.name} {user.age ? `(${user.age} ปี)` : ''}
+                      </div>
                       <div style={{fontSize: '0.85rem', opacity: 0.6}}>สะสมอยู่: {user.points - pointsUsed} แต้ม</div>
                     </div>
                   </div>
@@ -261,6 +288,26 @@ export default function POSTab() {
                     <button className="btn btn-primary" style={{padding: '8px', fontSize: '0.8rem', flex: 1, borderRadius: '10px'}} onClick={handleRedeemFreeItem} disabled={user.points - pointsUsed < 50}>
                       แถมฟรี! (50แต้ม)
                     </button>
+                  </div>
+                </div>
+              ) : customerPhone.length >= 10 && (
+                <div style={{padding: '16px', background: 'rgba(37, 99, 235, 0.05)', borderRadius: '20px', border: '1px dashed var(--pos-accent)', marginBottom: '16px'}}>
+                  <div style={{fontWeight: 700, color: 'var(--color-primary)', marginBottom: '12px', fontSize: '0.9rem'}}>ลงทะเบียนสมาชิกใหม่</div>
+                  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px'}}>
+                    <input 
+                      type="text" 
+                      placeholder="ชื่อเล่น" 
+                      value={nickname}
+                      onChange={e => setNickname(e.target.value)}
+                      style={{padding: '8px 12px', borderRadius: '12px', border: '1px solid var(--pos-border)', fontSize: '0.85rem'}}
+                    />
+                    <input 
+                      type="number" 
+                      placeholder="อายุ" 
+                      value={age}
+                      onChange={e => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                      style={{padding: '8px 12px', borderRadius: '12px', border: '1px solid var(--pos-border)', fontSize: '0.85rem'}}
+                    />
                   </div>
                 </div>
               )}
@@ -301,7 +348,7 @@ export default function POSTab() {
       </div>
 
       {showCashConfirm && createPortal(
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(42,36,31,0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setShowCashConfirm(false)}>
+        <div className="admin-theme-provider" style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setShowCashConfirm(false)}>
           <div className="surface-card anim-slide-up" style={{maxWidth: '400px', width: '90%', textAlign: 'center', padding: '40px', boxShadow: 'var(--shadow-lg)'}} onClick={e => e.stopPropagation()}>
             <h3 style={{marginBottom: '16px', color: 'var(--color-text)', fontSize: '1.6rem'}}>ยืนยันการรับเงินสด</h3>
             <div style={{fontSize: '3.5rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '16px', lineHeight: 1}}>
@@ -330,9 +377,9 @@ export default function POSTab() {
       )}
 
       {successMsg && createPortal(
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(42,36,31,0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setSuccessMsg('')}>
+        <div className="admin-theme-provider" style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setSuccessMsg('')}>
           <div className="surface-card anim-slide-up" style={{maxWidth: '400px', width: '90%', textAlign: 'center', padding: '40px', boxShadow: 'var(--shadow-lg)'}} onClick={e => e.stopPropagation()}>
-            <div style={{fontSize: '4rem', marginBottom: '16px'}}>✅</div>
+            <div style={{fontSize: '4rem', marginBottom: '16px', color: 'var(--color-success)'}}>Success</div>
             <h3 style={{marginBottom: '16px', color: 'var(--color-success)', fontSize: '1.8rem'}}>ส่งไปยังห้องครัวแล้ว!</h3>
             <p style={{color: 'var(--color-text-light)', marginBottom: '32px', fontSize: '1.1rem'}}>{successMsg.replace('Payment complete!', 'ชำระเงินเรียบร้อย!').replace('Earned', 'ได้รับ').replace('Used', 'ใช้ไป').replace('pts', 'แต้ม')}</p>
             <button className="btn btn-primary full-width" onClick={() => setSuccessMsg('')} style={{padding: '16px', fontSize: '1.1rem'}}>
@@ -344,9 +391,9 @@ export default function POSTab() {
       )}
 
       {showDiscountModal && createPortal(
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(42,36,31,0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setShowDiscountModal(false)}>
+        <div className="admin-theme-provider" style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(17, 24, 39, 0.6)', backdropFilter: 'blur(6px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}} onClick={() => setShowDiscountModal(false)}>
           <div className="surface-card anim-slide-up" style={{maxWidth: '400px', width: '90%', padding: '32px', boxShadow: 'var(--shadow-lg)'}} onClick={e => e.stopPropagation()}>
-            <h3 style={{marginBottom: '20px', color: 'var(--color-text)', fontSize: '1.4rem'}}>🏷️ จัดการส่วนลดพิเศษ</h3>
+            <h3 style={{marginBottom: '20px', color: 'var(--color-text)', fontSize: '1.4rem'}}>จัดการส่วนลดพิเศษ</h3>
             
             <div style={{display: 'flex', gap: '8px', marginBottom: '20px'}}>
               <button 

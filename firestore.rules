@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if the user is logged in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 1. Store Config: Read is public (for storefront), Write restricted to Admins
+    match /config/main {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 2. Orders: Public can create and read, only Admin can update/delete
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read: if true; // Needed for QueueTracker to show order status
+      allow update, delete: if isAuthenticated();
+    }
+
+    // 3. Products: Public can read, only Admin can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 4. Users (Loyalty): Public can read (for points check), only Admin can write
+    match /users/{phone} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 5. Counters: Admin can read/update (resets daily). 
+    // Actually, createOrder in db.ts increments counter so it needs public read/write if creating order.
+    // Wait, createOrder calls getNextQueueNumber which uses a transaction on /counters/{date}.
+    // So /counters must allow read/write for public!
+    match /counters/{date} {
+      allow read, write: if true; 
+    }
+    
+    // 6. Reviews: Public can read and write
+    match /reviews/{reviewId} {
+      allow read, write: if true;
+    }
+  }
+}
